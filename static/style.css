@@ -1,0 +1,132 @@
+/* Reset */
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+
+/* Top Bar */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ccc;
+    padding: 10px;
+    border-bottom: 2px solid #888;
+}
+
+.logo {
+    margin: 0;
+    letter-spacing: 4px;
+}
+
+/* Nav + Auth */
+.nav button,
+.auth button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    background: #bbb;
+    border: 1px solid #777;
+    cursor: pointer;
+}
+
+.nav .active {
+    background: #999;
+}
+
+/* Layout */
+.main {
+    display: flex;
+    height: calc(100vh - 60px);
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background: #aaa;
+    padding: 10px;
+    border-right: 2px solid #888;
+    overflow-y: auto;
+}
+
+.search {
+    width: 100%;
+    height: 25px;
+    margin-bottom: 10px;
+    background: #bbb;
+    border: 1px solid #777;
+}
+
+/* Filters */
+.filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+
+/* Sliders */
+.slider-group {
+    margin-bottom: 15px;
+}
+
+.slider-group label {
+    display: block;
+    font-size: 12px;
+}
+
+.slider-group input {
+    width: 100%;
+}
+
+.slider-group span {
+    font-size: 11px;
+    float: right;
+}
+
+/* Ratios */
+.ratios {
+    font-size: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+}
+
+/* Content */
+.content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+
+    background : conic-gradient(
+        #c7c7c7 90deg,
+        #b4b4b4 90deg 180deg,
+        #c7c7c7 180deg 270deg,
+        #b4b4b4 270deg
+
+    );
+    background-repeat: repeat;
+    background-size: 60px 60px;
+}
+
+/* Texture Card */
+.texture-card {
+    width: 200px;
+    background: #bbb;
+    border: 2px solid #777;
+    padding: 5px;
+}
+
+.texture-card img {
+    width: 100%;
+    display: block;
+}
+
+.texture-name {
+    width: 100%;
+    margin-top: 5px;
+    background: #999;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+}

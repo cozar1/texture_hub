@@ -1,0 +1,75 @@
+{% extends "template.html" %}
+{% block content %}
+
+<!-- Top Bar -->
+<header class="topbar">
+    <h1 class="logo">TEXTURE HUB</h1>
+
+    <nav class="nav">
+        <button>home</button>
+        <button class="active">collections</button>
+        <button>TEXTURES</button>
+    </nav>
+
+    <div class="auth">
+        <button>LOGIN</button>
+        <button>SIGN UP</button>
+    </div>
+</header>
+
+<!-- Main Layout -->
+<div class="main">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <input class="search" placeholder="">
+
+        <div class="filters">
+            <label><input type="radio"> RETRO</label>
+            <label><input type="radio"> COLORFUL</label>
+
+            <label><input type="radio"> REALISTIC</label>
+            <label><input type="radio"> ORGANIC</label>
+
+            <label><input type="radio"> STYLISED</label>
+            <label><input type="radio"> FUTURISTIC</label>
+
+            <label><input type="radio"> DULL</label>
+            <label><input type="radio"> MODERN</label>
+        </div>
+
+        <div class="slider-group">
+            <label>Resolution</label>
+            <input type="range">
+            <span>32x32</span>
+        </div>
+
+        <div class="slider-group">
+            <label>Colors</label>
+            <input type="range">
+            <span>256</span>
+        </div>
+
+        <div class="ratios">
+            <label><input type="radio"> 1:1</label>
+            <label><input type="radio"> 4:8</label>
+            <label><input type="radio"> 1:2</label>
+            <label><input type="radio"> 6:7</label>
+        </div>
+
+    </aside>
+
+    <!-- Content -->
+    <section class="content">
+
+        <div class="texture-card">
+            <img src="https://upload.wikimedia.org/wikipedia/en/5/57/Doom_screenshot.png">
+            <button class="texture-name">Stone Wall</button>
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}
