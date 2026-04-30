@@ -1,0 +1,29 @@
+{% extends "template.html" %}
+{% block content %}
+{% if error%}
+    <div class="error">
+        <p>{{error}}</p>
+    </div>
+{% endif%}
+<div class="login-page">
+    
+    <form class="auth-card" action="/signup" method="post">
+        <pre>
+   _____ _                         
+  / ____(_)                        
+ | (___  _  __ _ _ __  _   _ _ __  
+  \___ \| |/ _` | '_ \| | | | '_ \ 
+  ____) | | (_| | | | | |_| | |_) |
+ |_____/|_|\__, |_| |_|\__,_| .__/ 
+            __/ |           | |    
+           |___/            |_|    
+        </pre>
+        <p>Username</p>
+        <input type="text" name="username">
+        <p>Password</p>
+        <input type="password" name="password">
+        <input type="submit" value="Sign up">
+    </form>
+    <p class="auth-switch">Already have an account? <a href="/login">Login</a></p>
+</div>
+{% endblock %}

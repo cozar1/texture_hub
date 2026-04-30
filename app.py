@@ -24,6 +24,7 @@ def home():
 @app.route('/signup',methods=["POST","GET"])
 def signup():
     global user_id
+    error = None
 
     if request.method == 'POST':
         username = request.form.get('username')
@@ -31,8 +32,8 @@ def signup():
 
         if username and password:
             usernames = query("SELECT user_name FROM user")
-            if username in usernames:
-                return app.redirect("/login")
+            if (username,) in usernames:
+                error = "There is Already an Account with this Username"
             else:
                 query('''INSERT INTO user (user_name, user_password, user_rating)
                     VALUES (?, ?, ?)''',(username,password,0))
@@ -40,14 +41,15 @@ def signup():
                 _user_id = query("SELECT user_id FROM user WHERE user_name = ?",(username,))
                 user_id = _user_id
 
-            return app.redirect("/")
+                return app.redirect("/")
 
 
-    return render_template('login.html')
+    return render_template('signup.html', error=error)
 
 @app.route('/login',methods=["POST","GET"])
 def login():
     global user_id
+    error = None
 
     if request.method == 'POST':
         print("pos")
@@ -57,7 +59,6 @@ def login():
         if username and password:
             usernames = query("SELECT user_name FROM User")
             if (username,) in usernames:
-                print("username in usernames")
                 if password == query("SELECT user_password FROM User WHERE user_name = ?",(username,))[0][0]:
                     print("Logged in as "+str(username))
 
@@ -65,8 +66,13 @@ def login():
                     user_id = _user_id
 
                     return app.redirect("/")
+                else:
+                    error = "Username or Password is Incorrect"
+
+            else:
+                error = "Username isn't Registered with any Account"
 
 
-    return render_template('login.html')
+    return render_template('login.html', error=error)
 
 app.run(debug=True)
