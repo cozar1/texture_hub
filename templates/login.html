@@ -1,0 +1,13 @@
+{% extends "template.html" %}
+{% block content %}
+<div>
+    <form action="/login" method="post">
+        <label>Username</label>
+        <input type="text"  name="username">
+        <label>Password</label>
+        <input type="password"  name="password">
+        <input type="submit">
+    </form>
+</div>
+
+{% endblock %}

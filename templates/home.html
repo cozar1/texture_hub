@@ -12,8 +12,12 @@
     </nav>
 
     <div class="auth">
-        <button>LOGIN</button>
-        <button>SIGN UP</button>
+        {% if user_id %}
+            <p>{{user_id}}</p>
+        {% else %}
+            <a href="/login">LOGIN</a>
+            <a href="/signup">SIGNUP</a>
+        {% endif%}
     </div>
 </header>
 
