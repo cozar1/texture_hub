@@ -19,7 +19,8 @@ def home():
     global user_id
 
     textures = query("SELECT * FROM Texture")
-    return render_template('home.html', textures=textures, user_id=user_id)
+    user_name = query("SELECT user_name FROM user WHERE user_id = ?",(user_id,))[0][0]
+    return render_template('home.html', textures=textures, user_name=user_name)
 
 @app.route('/signup',methods=["POST","GET"])
 def signup():
@@ -38,7 +39,7 @@ def signup():
                 query('''INSERT INTO user (user_name, user_password, user_rating)
                     VALUES (?, ?, ?)''',(username,password,0))
                 
-                _user_id = query("SELECT user_id FROM user WHERE user_name = ?",(username,))
+                _user_id = query("SELECT user_id FROM user WHERE user_name = ?",(username,))[0][0]
                 user_id = _user_id
 
                 return app.redirect("/")
@@ -62,7 +63,7 @@ def login():
                 if password == query("SELECT user_password FROM User WHERE user_name = ?",(username,))[0][0]:
                     print("Logged in as "+str(username))
 
-                    _user_id = query("SELECT user_id FROM user WHERE user_name = ?",(username,))
+                    _user_id = query("SELECT user_id FROM user WHERE user_name = ?",(username,))[0][0]
                     user_id = _user_id
 
                     return app.redirect("/")
