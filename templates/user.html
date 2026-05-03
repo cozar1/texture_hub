@@ -1,0 +1,40 @@
+{% extends "template.html" %}
+{% block title %}{{ profile_user.user_name }} — Texture Hub{% endblock %}
+{% block content %}
+<div class="user-page">
+    <div class="user-banner">
+        <img src="/static/images/banner.png">
+    </div>
+    <div class="user-header">
+        <img src="/static/images/pfp.png">
+        <div class="user-header-info">
+            <h1 class="user-display-name">{{ profile_user.user_name }}</h1>
+            <p class="user-followers">{{ follower_count }} Followers</p>
+            <a> Follow </a>
+        </div>
+        <div class="user-header-options">
+            <a href="/logout">Logout</a>
+            <a href="/logout">Settings</a>
+        </div>
+    </div>
+    <div class="user-textures">
+        <div class="user_textures-header">
+            <h1>Textures</h1>
+            <div>
+            <a href="/upload"> Upload</a>
+            </div>
+        </div>
+        <div class="user-textures-row">
+            {% for texture in textures[:5] %}
+            <div class="texture-card texture-card--user-row">
+                <img src="{{ texture.texture_address | texture_url }}" alt="">
+                <p>{{ texture.texture_name }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="user-collections">
+        <h1>Collections</h1>
+    </div>
+</div>
+{% endblock %}

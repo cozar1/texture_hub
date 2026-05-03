@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   sodipodi:docname="drawing.svg"
+   inkscape:export-filename="placeholder_pfp.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.85680992"
+     inkscape:cx="-483.18768"
+     inkscape:cy="11.08764"
+     inkscape:window-width="2560"
+     inkscape:window-height="1369"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <pattern
+       inkscape:collect="always"
+       xlink:href="#Checkerboard"
+       preserveAspectRatio="xMidYMid"
+       id="pattern34"
+       patternTransform="scale(10)" />
+    <pattern
+       inkscape:collect="always"
+       style="fill:#000000"
+       patternUnits="userSpaceOnUse"
+       width="2"
+       height="2"
+       patternTransform="translate(0,0) scale(10,10)"
+       id="Checkerboard"
+       inkscape:stockid="Checkerboard"
+       preserveAspectRatio="xMidYMid"
+       inkscape:isstock="true"
+       inkscape:label="Checkerboard">
+      <rect
+   style="stroke:none"
+   x="0"
+   y="0"
+   width="1"
+   height="1"
+   id="rect209" />
+
+      <rect
+   style="stroke:none"
+   x="1"
+   y="1"
+   width="1"
+   height="1"
+   id="rect211" />
+
+    </pattern>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath5">
+      <rect
+         style="fill:#000000;stroke:#000000;stroke-width:0;stroke-linejoin:bevel;paint-order:stroke markers fill;stop-color:#000000"
+         id="rect5-4"
+         width="20"
+         height="200"
+         x="530"
+         y="595" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath55">
+      <path
+         id="path55"
+         style="stroke-width:0.1;stroke-linecap:square;paint-order:markers fill stroke;stop-color:#000000"
+         d="m 1736.6147,-745.57287 h 1589.4765 v 72.46715 H 1736.6147 Z" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath54">
+      <path
+         id="path54"
+         style="stroke-width:0.0999999;stroke-linecap:square;paint-order:markers fill stroke;stop-color:#000000"
+         d="m 1691.1994,-792.32001 h 1634.8919 v 92.82806 H 1691.1994 Z" />
+    </clipPath>
+    <pattern
+       inkscape:collect="always"
+       xlink:href="#pattern6-7"
+       preserveAspectRatio="xMidYMid"
+       id="pattern2"
+       patternTransform="translate(320.58405,362.47044)"
+       x="0"
+       y="0" />
+    <pattern
+       patternUnits="userSpaceOnUse"
+       width="28.28"
+       height="23.44"
+       patternTransform="translate(190,350)"
+       preserveAspectRatio="xMidYMid"
+       style="fill:#000000"
+       id="pattern6-7"
+       inkscape:label="pattern6-7"
+       inkscape:collect="always"
+       inkscape:isstock="true">
+      <path
+         style="paint-order:stroke markers fill;stop-color:#000000"
+         d="M 0,0        A 20,20 0,0,1 14.14,5.86        A 20,20 0,0,0 28.28,11.72        L 28.28, 23.44        A 20,20 0,0,1 14.14,17.58        A 20,20 0,0,0 0,11.72        L 0,0 "
+         id="path4-2"
+         sodipodi:nodetypes="cc" />
+    </pattern>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath3">
+      <circle
+         style="fill:#68f2af;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;paint-order:fill markers stroke"
+         id="circle3"
+         cx="50.973038"
+         cy="139.60223"
+         r="22.449732" />
+    </clipPath>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g4"
+       inkscape:export-filename="banner.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="translate(-332.39171,-90.673901)">
+      <rect
+         style="fill:#a0a0a0;fill-opacity:1;stroke:none;stroke-width:1.26243;stroke-linecap:round;stroke-linejoin:round;paint-order:fill markers stroke"
+         id="rect1"
+         width="323.47845"
+         height="53.726192"
+         x="8.9132595"
+         y="53.431244" />
+      <rect
+         style="fill:url(#pattern2);stroke:none;stroke-width:1.26242;stroke-linecap:round;stroke-linejoin:round;paint-order:fill markers stroke"
+         id="rect2"
+         width="323.47845"
+         height="53.726192"
+         x="8.9132595"
+         y="53.431244" />
+    </g>
+    <g
+       id="g3"
+       inkscape:export-filename="pfp.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96">
+      <circle
+         style="fill:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;paint-order:fill markers stroke;fill-opacity:1"
+         id="path1"
+         cx="50.973038"
+         cy="139.60223"
+         r="22.449732" />
+      <circle
+         style="fill:#000000;fill-opacity:1;stroke-width:1.60047;stroke-linecap:round;stroke-linejoin:round;paint-order:fill markers stroke"
+         id="path2"
+         cx="50.973038"
+         cy="157.98824"
+         r="15.579887"
+         clip-path="url(#clipPath3)" />
+      <circle
+         style="fill:#000000;fill-opacity:1;stroke-width:0.754065;stroke-linecap:round;stroke-linejoin:round;paint-order:fill markers stroke"
+         id="circle2"
+         cx="50.973038"
+         cy="132.3793"
+         r="7.3404913" />
+    </g>
+    <g
+       id="g34"
+       inkscape:export-filename="texture.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96">
+      <rect
+         style="fill:#a0a0a0;fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;paint-order:fill markers stroke"
+         id="rect4"
+         width="67.472908"
+         height="67.472908"
+         x="100.05136"
+         y="126.917" />
+      <rect
+         style="fill:url(#pattern34);stroke-width:1;stroke-linecap:round;stroke-linejoin:round;paint-order:fill markers stroke"
+         id="rect5"
+         width="67.472908"
+         height="67.472908"
+         x="100.05136"
+         y="126.917" />
+    </g>
+  </g>
+</svg>

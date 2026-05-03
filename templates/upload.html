@@ -1,3 +1,88 @@
 {% extends "template.html" %}
+{% block title %}Upload Texture — Texture Hub{% endblock %}
 {% block content %}
+<div class="upload-page">
+    <div class="upload-column">
+        <h1 class="upload-title">Upload Texture</h1>
+
+        {% if error %}
+        <p class="upload-error" role="alert">{{ error }}</p>
+        {% endif %}
+
+        <form class="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+            <label class="upload-dropzone" id="upload-zone" for="file-input">
+                <span class="upload-placeholder" id="upload-placeholder">Upload</span>
+                <img id="upload-preview" class="upload-preview hidden" alt="Preview">
+                <input type="file" id="file-input" name="image" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
+            </label>
+
+            <div class="upload-field-row">
+                <label for="display-name">Display Name</label>
+                <input type="text" id="display-name" name="display_name" autocomplete="off" required maxlength="80"
+                       value="{{ request.form.get('display_name', '') }}">
+            </div>
+
+            <div class="upload-submit-wrap">
+                <button type="submit" class="upload-submit">Upload</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+(function () {
+    var zone = document.getElementById('upload-zone');
+    var input = document.getElementById('file-input');
+    var preview = document.getElementById('upload-preview');
+    var placeholder = document.getElementById('upload-placeholder');
+
+    function showPreview(file) {
+        if (!file || !file.type || file.type.indexOf('image/') !== 0) return;
+        preview.src = URL.createObjectURL(file);
+        preview.classList.remove('hidden');
+        placeholder.style.display = 'none';
+    }
+
+    function resetPreview() {
+        if (preview.src && preview.src.indexOf('blob:') === 0) URL.revokeObjectURL(preview.src);
+        preview.removeAttribute('src');
+        preview.classList.add('hidden');
+        placeholder.style.display = '';
+    }
+
+    input.addEventListener('change', function () {
+        var f = input.files && input.files[0];
+        resetPreview();
+        if (f) showPreview(f);
+    });
+
+    ['dragenter', 'dragover'].forEach(function (evName) {
+        zone.addEventListener(evName, function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            zone.classList.add('upload-dropzone--drag');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(function (evName) {
+        zone.addEventListener(evName, function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            zone.classList.remove('upload-dropzone--drag');
+        });
+    });
+
+    zone.addEventListener('drop', function (e) {
+        var dt = e.dataTransfer;
+        if (!dt || !dt.files || !dt.files.length) return;
+        var f = dt.files[0];
+        if (!f.type || f.type.indexOf('image/') !== 0) return;
+        var buf = new DataTransfer();
+        buf.items.add(f);
+        input.files = buf.files;
+        resetPreview();
+        showPreview(f);
+    });
+})();
+</script>
 {% endblock %}

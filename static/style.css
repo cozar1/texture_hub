@@ -1,18 +1,82 @@
+:root {
+    /* Colors */
+    --bg-main: #008080;
+    --bg-light: #ccc;
+    --bg-mid: #bbb;
+    --bg-dark: #999;
+    --bg-panel: #aaa;
+
+    --text-main: #111;
+    --text-invert: #fff;
+
+    --border-light: #888;
+    --border-dark: #777;
+
+    /* Effects */
+    --border-outset: 2px outset var(--border-light);
+    --border-inset: 1px outset var(--border-dark);
+
+    /* Layout */
+    --pad-sm: 5px;
+    --pad-md: 10px;
+    --pad-lg: 20px;
+}
+
 /* Reset */
 body {
     margin: 0;
-    font-family: sans-serif;
-    background-color: black;
+    font-family: monospace;
+    background: var(--bg-main);
+    color: var(--text-main);
+}
+
+/* Shared UI */
+button,
+.dropbtn,
+.texture-name,
+input[type="submit"] {
+    padding: var(--pad-sm) var(--pad-md);
+    background: var(--bg-mid);
+    border: var(--border-inset);
+    cursor: pointer;
+    font-family: monospace;
+}
+
+button:hover,
+.dropbtn:hover {
+    background: var(--bg-dark);
+}
+
+a {
+    padding: var(--pad-sm) var(--pad-md);
+    background: var(--bg-mid);
+    border: var(--border-inset);
+    cursor: pointer;
+    font-family: monospace;
+    color: black;
+    text-decoration: none;
+}
+
+button:hover,
+.dropbtn:hover {
+    background: var(--bg-dark);
+}
+
+input,
+.search {
+    background: var(--bg-mid);
+    border: var(--border-inset);
+    font-family: monospace;
 }
 
 /* Top Bar */
 .topbar {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    background: #ccc;
-    padding: 10px;
-    border-bottom: 2px solid #888;
+    align-items: center;
+    padding: var(--pad-md);
+    background: var(--bg-light);
+    border-bottom: var(--border-outset);
 }
 
 .logo {
@@ -20,18 +84,13 @@ body {
     letter-spacing: 4px;
 }
 
-/* Nav + Auth */
 .nav button,
 .auth button {
     margin: 0 5px;
-    padding: 5px 10px;
-    background: #bbb;
-    border: 1px solid #777;
-    cursor: pointer;
 }
 
 .nav .active {
-    background: #999;
+    background: var(--bg-dark);
 }
 
 /* Layout */
@@ -43,32 +102,30 @@ body {
 /* Sidebar */
 .sidebar {
     width: 250px;
-    background: #aaa;
-    padding: 10px;
-    border-right: 2px solid #888;
+    background: var(--bg-panel);
+    padding: var(--pad-md);
+    border-right: var(--border-outset);
     overflow-y: auto;
 }
 
 .search {
     width: 100%;
     height: 25px;
-    margin-bottom: 10px;
-    background: #bbb;
-    border: 1px solid #777;
+    margin-bottom: var(--pad-md);
 }
 
-/* Filters */
-.filters {
+/* Grid helpers */
+.filters,
+.ratios {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 5px;
+    gap: var(--pad-sm);
     font-size: 12px;
-    margin-bottom: 15px;
 }
 
 /* Sliders */
 .slider-group {
-    margin-bottom: 15px;
+    margin-bottom: var(--pad-md);
 }
 
 .slider-group label {
@@ -81,127 +138,329 @@ body {
 }
 
 .slider-group span {
-    font-size: 11px;
     float: right;
-}
-
-/* Ratios */
-.ratios {
-    font-size: 12px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px;
+    font-size: 11px;
 }
 
 /* Content */
 .content {
     flex: 1;
-    padding: 20px;
+    min-width: 0;
+    padding: var(--pad-lg);
     overflow-y: auto;
-
-    background : conic-gradient(
-        #c7c7c7 90deg,
-        #b4b4b4 90deg 180deg,
-        #c7c7c7 180deg 270deg,
-        #b4b4b4 270deg
-
-    );
-    background-repeat: repeat;
-    background-size: 60px 60px;
+    background: var(--bg-main);
 }
 
-/* Texture Card */
+.texture-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 200px);
+    gap: var(--pad-md);
+    justify-content: start;
+    align-content: start;
+}
+
+/* Card */
 .texture-card {
-    width: 200px;
-    background: #bbb;
-    border: 2px solid #777;
-    padding: 5px;
+    width: 100%;
+    max-width: 200px;
+    box-sizing: border-box;
+    text-align: center;
+    background: var(--bg-mid);
+    border: var(--border-outset);
+    padding: var(--pad-sm);
 }
 
 .texture-card img {
     width: 100%;
     display: block;
+    aspect-ratio: 1;
+    object-fit: cover;
 }
 
 .texture-name {
     width: 100%;
-    margin-top: 5px;
-    background: #999;
+    margin-top: var(--pad-sm);
+    background: var(--bg-dark);
     border: none;
-    padding: 5px;
-    cursor: pointer;
 }
 
+/* Dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.auth .dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 6px;
+    background: #f1f1f1;
+    min-width: 160px;
+}
+
+.auth .dropdown-content a {
+    display: block;
+    padding: 12px 16px;
+    color: black;
+    text-decoration: none;
+}
+
+.auth .dropdown-content a:hover {
+    background: #ddd;
+}
+
+.dropbtn:hover + .dropdown-content,
+.auth .dropdown-content:hover {
+    display: block;
+}
+
+/* Error */
 .error {
     position: absolute;
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    margin: 20px;
-    padding: 10px;
-    color : white;
-    display: grid;
-    font-family: monospace;
-    border: red 1px dashed;
+    padding: var(--pad-md);
+    color: var(--text-invert);
+    border: 1px dashed red;
 }
 
+/* Login */
 .login-page {
-    min-height: calc(80vh - 60px);
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    color: #00ff37;
-    align-items: center;
     justify-content: center;
-    font-size: 20px;
+    align-items: center;
     padding: 40px 16px;
+    font-size: 18px;
+    background: var(--bg-main);
     font-family: monospace;
 }
 
-.login-page .auth-card {
+.auth-card {
     width: min(420px, 100%);
-    margin: 0 auto;
-    margin-bottom: 10px;
-    padding: 18px 18px 14px;
-    border: 2px dashed;
-    border-color : #00ff37;;
-    box-sizing: border-box;
+    padding: 24px 20px;
+    background: var(--bg-mid);
+    border: var(--border-outset);
     text-align: center;
-}
-
-.login-page p {
-    text-align: center;
-}
-
-.login-page pre {
-    margin: 0 0 10px;
-    white-space: pre;
 }
 
 .login-page input[type="text"],
 .login-page input[type="password"] {
-    font-family: monospace;
-    width: min(260px, 100%);
-    height: 28px;
-    padding: 4px 8px;
-    box-sizing: border-box;
-    background: #00ff37;;;
-    border: 1px solid #777;
-    font-size: 20px;
+    width: 100%;
+    max-width: 340px;
+    height: 36px;
+    margin: 8px auto 14px;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid var(--border-dark);
+}
+
+.user-page {
+    display:block;
+    min-height: calc(100vh - 60px);
+    margin: 0vw 30vw 0vw 30vw;
+    background: var(--bg-light);
+}
+
+.user-banner {
+    width: 100%;
+    height: clamp(140px, 18vw, 220px);
+    overflow: hidden;
+}
+
+.user-banner img {
+    width: 100%;
+    height: 100%;
     display: block;
-    margin: 8px auto 12px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.user-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 3fr;
+    padding: 1rem;
+}
+
+.user-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 3fr;
+    padding: 1rem;
+}
+
+.user-header-info {
+    display:block
+}
+
+.user-header-options {
+    display: block;
+    text-align: right;
+}
+
+.user-header-options a {
+    display: inline-block; /* Ensure children are not full-width block elements */
+}
+
+.user-textures {
+    margin: 1rem;
+}
+
+.user-textures-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: var(--pad-md);
+    align-items: stretch;
+    overflow-x: auto;
+    padding-bottom: var(--pad-sm);
+}
+
+.user-textures-row .texture-card--user-row {
+    width: 160px;
+    max-width: 160px;
+    flex: 0 0 auto;
+}
+
+.user_textures-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center; /* Vertically centers children */
+}
+
+.user_textures-header div {
+    display: inline-block;
+    text-align: right;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Upload texture page */
+.upload-page {
+    min-height: calc(100vh - 60px);
+    box-sizing: border-box;
+    padding: 28px max(24px, 8vw);
+    background: var(--bg-main);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.upload-column {
+    width: 100%;
+    max-width: 520px;
+    background: var(--bg-light);
+    border: 2px solid #111;
+    padding: 28px 32px 36px;
+    box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #555;
+}
+
+.upload-title {
+    margin: 0 0 24px;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: bold;
+    letter-spacing: 0.02em;
+}
+
+.upload-error {
+    margin: 0 0 16px;
+    padding: 10px;
+    border: 1px dashed #900;
+    background: #ebb;
+    color: #300;
     text-align: center;
 }
 
-.login-page input[type="submit"] {
-    color: black;
-    background-color: #00ff37;
-    border: 0px;
-    font-size: 20px;
-    font-family: monospace;
-}
-
-.login-page .auth-switch {
+.upload-form {
     margin: 0;
+}
+
+.upload-dropzone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 240px;
+    aspect-ratio: 1;
+    max-height: min(360px, 70vw);
+    margin: 0 auto;
+    background: #555;
+    border: 2px solid #000;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.upload-dropzone--drag {
+    outline: 3px dashed var(--bg-light);
+    outline-offset: -8px;
+}
+
+.upload-placeholder {
+    color: var(--text-invert);
+    font-size: 1.15rem;
+    pointer-events: none;
+}
+
+.upload-preview {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #444;
+}
+
+.upload-field-row {
+    margin-top: 22px;
+}
+
+.upload-field-row label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.upload-field-row input[type="text"] {
+    width: 100%;
+    max-width: 320px;
+    padding: 10px 12px;
+    background: #555;
+    color: var(--text-invert);
+    border: 1px solid #000;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+.upload-submit-wrap {
+    margin-top: 32px;
     text-align: center;
 }
 
+.upload-submit {
+    padding: 12px 36px;
+    font-family: monospace;
+    font-size: 1rem;
+    font-weight: bold;
+    background: var(--bg-light);
+    color: var(--text-main);
+    border: 2px outset #fff;
+    border-right-color: #555;
+    border-bottom-color: #555;
+    cursor: pointer;
+}
+
+.upload-submit:active {
+    border-style: inset;
+    border-right-color: #fff;
+    border-bottom-color: #fff;
+    border-top-color: #555;
+    border-left-color: #555;
+}

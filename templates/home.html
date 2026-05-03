@@ -1,26 +1,6 @@
 {% extends "template.html" %}
 {% block content %}
 
-<!-- Top Bar -->
-<header class="topbar">
-    <h1 class="logo">TEXTURE HUB</h1>
-
-    <nav class="nav">
-        <button>TEXTURES</button>
-        <button class="active">COLLECTIONS</button>
-    </nav>
-
-    <nav class="auth">
-        {% if user_name %}
-            <button>UPLOAD</button>
-            <button>{{user_name}}</button>
-        {% else %}
-            <a href="/login">LOGIN</a>
-            <a href="/signup">SIGNUP</a>
-        {% endif%}
-    </nav>
-</header>
-
 <!-- Main Layout -->
 <div class="main">
 
@@ -30,6 +10,14 @@
 
     <!-- Content -->
     <section class="content">
+        <div class="texture-grid">
+            {% for texture in textures %}
+            <div class="texture-card">
+                <img src="{{ texture.texture_address | texture_url }}" alt="">
+                <p>{{texture.texture_name}}</p>
+            </div>
+            {% endfor %}
+        </div>
     </section>
 
 </div>

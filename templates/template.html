@@ -4,9 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/style.css">
-    <title>Document</title>
+    <title>{% block title %}Texture Hub{% endblock %}</title>
 </head>
 <body>
+    {% if request.endpoint not in ('login', 'signup') %}
+    <!-- Top Bar -->
+    <header class="topbar">
+        <a href="/" class="logo">TEXTURE HUB</a>
+
+        <nav class="nav">
+            <button>TEXTURES</button>
+            <button class="active">COLLECTIONS</button>
+        </nav>
+
+        <nav class="auth">
+            {% if user %}
+                <a href="/upload">UPLOAD</a>
+                <a class="dropbtn" href="/user/{{ user.user_name }}">{{ user.user_name }}</a>
+                <div class="dropdown-content">
+                    <a href="/logout">Log Out</a>
+                </div>
+            {% else %}
+                <a href="/login">LOGIN</a>
+                <a href="/signup">SIGNUP</a>
+            {% endif %}
+        </nav>
+    </header>
+    {% endif %}
     {% block content %}
     {% endblock %}
 </body>
