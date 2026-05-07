@@ -11,6 +11,9 @@
 
     --border-light: #888;
     --border-dark: #777;
+    --bevel-hi: #fff;
+    --bevel-lo: #555;
+    --bevel-mid: #111;
 
     /* Effects */
     --border-outset: 2px outset var(--border-light);
@@ -37,7 +40,11 @@ button,
 input[type="submit"] {
     padding: var(--pad-sm) var(--pad-md);
     background: var(--bg-mid);
-    border: var(--border-inset);
+    border: 2px solid var(--bevel-mid);
+    border-top-color: var(--bevel-hi);
+    border-left-color: var(--bevel-hi);
+    border-right-color: var(--bevel-lo);
+    border-bottom-color: var(--bevel-lo);
     cursor: pointer;
     font-family: monospace;
 }
@@ -50,7 +57,11 @@ button:hover,
 a {
     padding: var(--pad-sm) var(--pad-md);
     background: var(--bg-mid);
-    border: var(--border-inset);
+    border: 2px solid var(--bevel-mid);
+    border-top-color: var(--bevel-hi);
+    border-left-color: var(--bevel-hi);
+    border-right-color: var(--bevel-lo);
+    border-bottom-color: var(--bevel-lo);
     cursor: pointer;
     font-family: monospace;
     color: black;
@@ -65,7 +76,11 @@ button:hover,
 input,
 .search {
     background: var(--bg-mid);
-    border: var(--border-inset);
+    border: 2px solid var(--bevel-mid);
+    border-top-color: var(--bevel-lo);
+    border-left-color: var(--bevel-lo);
+    border-right-color: var(--bevel-hi);
+    border-bottom-color: var(--bevel-hi);
     font-family: monospace;
 }
 
@@ -77,20 +92,60 @@ input,
     padding: var(--pad-md);
     background: var(--bg-light);
     border-bottom: var(--border-outset);
+    gap: 14px;
 }
 
 .logo {
     margin: 0;
     letter-spacing: 4px;
+    font-size: 42px;
+    line-height: 1;
+    padding: 0;
+    background: transparent;
+    border: 0;
 }
 
-.nav button,
-.auth button {
-    margin: 0 5px;
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.nav .active {
-    background: var(--bg-dark);
+.nav-btn {
+    display: inline-block;
+    padding: 4px 14px;
+    background: var(--bg-mid);
+    border: var(--border-inset);
+    font-family: monospace;
+    text-decoration: none;
+    color: #000;
+    letter-spacing: 0.5px;
+}
+
+.nav-btn--active {
+    background: var(--bg-light);
+    border: 2px solid var(--bevel-mid);
+    border-top-color: var(--bevel-lo);
+    border-left-color: var(--bevel-lo);
+    border-right-color: var(--bevel-hi);
+    border-bottom-color: var(--bevel-hi);
+}
+
+.nav-btn--disabled {
+    opacity: 0.85;
+    cursor: default;
+    pointer-events: none;
+}
+
+.auth {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.auth a {
+    padding: 4px 12px;
 }
 
 /* Layout */
@@ -211,6 +266,106 @@ input,
     background: var(--bg-main);
 }
 
+/* Texture detail page (aesthetic only) */
+.texture-shell {
+    min-height: calc(100vh - 60px);
+    background: var(--bg-main);
+    padding: 24px 0 34px;
+    box-sizing: border-box;
+    display: block;
+}
+
+.texture-shell__sidebar {
+    display: none;
+    min-height: calc(100vh - 60px);
+}
+
+.texture-shell__main {
+    background: transparent;
+    padding: 0;
+}
+
+.texture-panel {
+    width: min(980px, calc(100% - 32px));
+    margin: 0 auto;
+    background: var(--bg-light);
+    border: 2px solid var(--bevel-mid);
+    border-top-color: var(--bevel-hi);
+    border-left-color: var(--bevel-hi);
+    border-right-color: var(--bevel-lo);
+    border-bottom-color: var(--bevel-lo);
+}
+
+.texture-hero {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 26px;
+    align-items: start;
+    padding: 18px 18px 22px;
+}
+
+.texture-hero__frame {
+    background: #666;
+    border: 2px solid var(--bevel-mid);
+    border-top-color: var(--bevel-hi);
+    border-left-color: var(--bevel-hi);
+    border-right-color: var(--bevel-lo);
+    border-bottom-color: var(--bevel-lo);
+}
+
+.texture-hero__img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 1;
+    object-fit: contain;
+    background: #444;
+}
+
+.texture-hero__download {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.texture-hero__download input[type="submit"] {
+    width: 100%;
+    max-width: 220px;
+    padding: 6px 10px;
+    background: var(--bg-mid);
+    text-transform: lowercase;
+}
+
+.texture-hero__title {
+    margin: 0;
+    font-size: 48px;
+    line-height: 1;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+.texture-hero__sub {
+    margin-top: 8px;
+    font-size: 16px;
+}
+
+.texture-hero__user {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    text-decoration: underline;
+}
+
+.texture-hero__blurb {
+    margin-top: 18px;
+    max-width: 520px;
+    font-size: 14px;
+    line-height: 1.55;
+    opacity: 0.9;
+}
+
+.texture-hero__blurb div {
+    height: 14px;
+}
+
 .texture-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, 200px);
@@ -225,9 +380,16 @@ input,
     max-width: 200px;
     box-sizing: border-box;
     text-align: center;
-    background: var(--bg-mid);
-    border: var(--border-outset);
-    padding: var(--pad-sm);
+}
+
+.texture-card-link {
+    display: block;
+    padding: 0;
+    border: 2px solid var(--bevel-mid);
+    border-top-color: var(--bevel-hi);
+    border-left-color: var(--bevel-hi);
+    border-right-color: var(--bevel-lo);
+    border-bottom-color: var(--bevel-lo);
 }
 
 .texture-card img {
@@ -240,7 +402,8 @@ input,
 .texture-name {
     width: 100%;
     margin-top: var(--pad-sm);
-    background: var(--bg-dark);
+    text-align: center;
+    background: none;
     border: none;
 }
 
@@ -322,8 +485,14 @@ input,
 .user-page {
     display:block;
     min-height: calc(100vh - 60px);
-    margin: 0vw 15rem 0vw 15rem;
+    width: min(1120px, calc(100% - 48px));
+    margin: 24px auto;
     background: var(--bg-light);
+    border: 2px solid var(--bevel-mid);
+    border-top-color: var(--bevel-hi);
+    border-left-color: var(--bevel-hi);
+    border-right-color: var(--bevel-lo);
+    border-bottom-color: var(--bevel-lo);
 }
 
 .user-banner {
@@ -415,9 +584,12 @@ input,
     width: 100%;
     max-width: 520px;
     background: var(--bg-light);
-    border: 2px solid #111;
+    border: 2px solid var(--bevel-mid);
+    border-top-color: var(--bevel-hi);
+    border-left-color: var(--bevel-hi);
+    border-right-color: var(--bevel-lo);
+    border-bottom-color: var(--bevel-lo);
     padding: 28px 32px 36px;
-    box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #555;
 }
 
 .upload-title {
@@ -451,7 +623,11 @@ input,
     max-height: min(360px, 70vw);
     margin: 0 auto;
     background: #555;
-    border: 2px solid #000;
+    border: 2px solid var(--bevel-mid);
+    border-top-color: var(--bevel-hi);
+    border-left-color: var(--bevel-hi);
+    border-right-color: var(--bevel-lo);
+    border-bottom-color: var(--bevel-lo);
     cursor: pointer;
     position: relative;
     overflow: hidden;

@@ -1,4 +1,5 @@
 {% extends "template.html" %}
+
 {% block content %}
 
 <!-- Main Layout -->
@@ -29,12 +30,7 @@
     <section class="content">
         <div class="texture-grid">
             {% for texture in textures %}
-            <a href="/texture/{{texture.texture_id}}">
-                <div class="texture-card">
-                    <img src="{{ texture.texture_address | texture_url }}" alt="">
-                    <p>{{texture.texture_name}}</p>
-                </div>
-            </a>
+            {% include "texture_template.html" %}
             {% endfor %}
             {% if not textures %}
                 <div class="home-empty">

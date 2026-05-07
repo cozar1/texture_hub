@@ -1,0 +1,21 @@
+{% extends "template.html" %}
+{% block content %}
+<div class="create-collection-page">
+    <div class="upload-column">
+        <h1 class="upload-title">Create Collection</h1>
+
+        {% if error %}
+        <p class="upload-error" role="alert">{{ error }}</p>
+        {% endif %}
+
+        <form class="upload-form" action="/create_collection" method="post" enctype="multipart/form-data">
+            <label for="display-name">Display Name</label>
+            <input type="text" id="display-name" name="display_name" autocomplete="off" required maxlength="80"
+                       value="{{ request.form.get('display_name', '') }}">
+            <input type="submit">
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}

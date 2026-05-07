@@ -1,12 +1,44 @@
 {% extends "template.html" %}
 {% block title %}Texture Hub{% endblock %}
 {% block content %}
-<div class="texture-page">
-    <img src="{{ texture.texture_address | texture_url }}" alt="">
-    <p>{{texture.texture_name}}</p>
-    <p>Uploaded by {{ uploaded_user.user_name }}</p>
-    <form action="/download/{{texture.texture_id}}" method="post">
-        <input type="submit" value="Download">
-    </form>
-</div>  
+<div class="texture-shell">
+    <aside class="texture-shell__sidebar" aria-hidden="true"></aside>
+
+    <main class="texture-shell__main">
+        <section class="texture-panel">
+            <div class="texture-hero">
+                <div class="texture-hero__preview">
+                    <div class="texture-hero__frame">
+                        <img class="texture-hero__img" src="{{ texture.texture_address | texture_url }}" alt="{{ texture.texture_name }}">
+                    </div>
+                    <form class="texture-hero__download" action="/download/{{texture.texture_id}}" method="post">
+                        <input type="submit" value="download">
+                    </form>
+                    
+                    <label for="cars">Add to Collection</label>
+                    <form>
+                        <select name="cars" id="cars">
+                            <option value="volvo">Volvo</option>
+                            <option value="saab">Saab</option>
+                            <option value="mercedes">Mercedes</option>
+                            <option value="audi">Audi</option>
+                        </select>
+                        <input type="submit" value="+">
+                    </form>
+                </div>
+
+                <div class="texture-hero__meta">
+                    <h1 class="texture-hero__title">{{ texture.texture_name }}</h1>
+                    <div class="texture-hero__sub">Uploaded by <a class="texture-hero__user" href="/user/{{ uploaded_user.user_name }}">{{ uploaded_user.user_name }}</a></div>
+
+                    <div class="texture-hero__blurb" aria-hidden="true">
+                        <div> </div>
+                        <div> </div>
+                        <div> </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
 {% endblock %}

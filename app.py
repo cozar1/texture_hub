@@ -64,6 +64,18 @@ class Texture(db.Model):
     texture_address = db.Column(db.String(120), nullable=False)
     texture_user_id = db.Column(db.Integer, default=0)
 
+class Collection(db.Model):
+    __tablename__ = 'Collection'
+    collection_id = db.Column(db.Integer, primary_key=True)
+    collection_name = db.Column(db.String(80), unique=True, nullable=False)
+    collection_user_id = db.Column(db.String(120), nullable=False)
+    collection_rating = db.Column(db.Integer, default=0)
+
+class Texture_Collection(db.Model):
+    __tablename__ = 'Texture_Collection'
+    texture_collection_id = db.Column(db.Integer, primary_key= True)
+    texture_id = db.Column(db.Integer, foreign_key= True)
+    collection_id = db.Column(db.Integer, foreign_key= True)
 
 
 # --- Routes ---
@@ -174,6 +186,7 @@ def user_profile(username):
         abort(404)
 
     textures = Texture.query.filter_by(texture_user_id=profile_user.user_id).all()
+    collections = Collection.query.filter_by(collection_user_id = profile_user.user_id).all()
 
     return render_template(
         'user.html',
@@ -186,6 +199,7 @@ def user_profile(username):
         texture_more_total=13357,
         collection_more_total=13357,
         textures=textures,
+        collections=collections
     )
 
 
@@ -228,6 +242,34 @@ def upload():
                 return redirect('/')
 
     return render_template('upload.html', user=user, error=error)
+
+@app.route('/create_collection', methods=['GET', 'POST'])
+def create_collection():
+    user = get_current_user()
+    if user is None:
+        return redirect('/login')
+
+    if request.method == 'POST':
+        display_name = (request.form.get('display_name') or '').strip()
+
+        if display_name:
+            collection = Collection(collection_name = display_name, collection_user_id = user.user_id)
+            db.session.add(collection)
+            db.session.commit()
+
+        return redirect('/')
+
+    return render_template('create_collection.html', user=user)
+
+@app.route('/collection/<_collection_id>', methods=['GET', 'POST'])
+def collection(_collection_id):
+    user = get_current_user()
+
+
+    collection = Collection.query.filter_by(collection_id = _collection_id).one()
+    collection_user = User.query.filter_by(user_id = collection.collection_user_id).one()
+
+    return render_template('collection.html', user=user, collection=collection, collection_user=collection_user)
 
 @app.route('/download/<int:texture_id>', methods=['GET', 'POST'])
 def download_image(texture_id):

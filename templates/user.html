@@ -28,15 +28,24 @@
         </div>
         <div class="user-textures-row">
             {% for texture in textures[:5] %}
-            <div class="texture-card texture-card--user-row">
-                <img src="{{ texture.texture_address | texture_url }}" alt="">
-                <p>{{ texture.texture_name }}</p>
-            </div>
+            {% include "texture_template.html" %}
             {% endfor %}
         </div>
     </div>
-    <div class="user-collections">
-        <h1>Collections</h1>
+        <div class="user_textures-header">
+            <h1>Collections</h1>
+            <div>
+            {% if user %}
+            <a href="/?user={{ user.user_name | urlencode }}">Show all</a>
+            {% endif %}
+            <a href="/create_collection"> Create</a>
+            </div>
+        </div>
+        <div class="user-textures-row">
+            {% for collection in collections[:5] %}
+            {% include "collection_template.html" %}
+            {% endfor %}
+        </div>
     </div>
 </div>
 {% endblock %}
