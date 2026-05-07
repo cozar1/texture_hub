@@ -1,9 +1,10 @@
 import os
 import uuid
 
-from flask import Flask, render_template, request, redirect, session, abort
+from flask import Flask, render_template, request, redirect, send_file, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
+from sqlalchemy import func
 
 app = Flask(__name__)
 app.secret_key = 'replace-this-with-a-secure-secret'
@@ -67,10 +68,47 @@ class Texture(db.Model):
 
 # --- Routes ---
 
-@app.route('/')
+@app.route('/',methods=["POST", "GET"])
 def home():
-    textures = Texture.query.all()
-    return render_template('home.html', user=get_current_user(), textures=textures)
+    # Prefer query-string filters (GET) so the URL is shareable/bookmarkable,
+    # but also accept POST payloads to keep older forms working.
+    src = request.args if request.method == 'GET' else request.form
+    name_q = (src.get('name') or '').strip()
+    user_q = (src.get('user') or '').strip()
+    sort = (src.get('sort') or 'new').strip().lower()
+
+    q = db.session.query(Texture).outerjoin(User, User.user_id == Texture.texture_user_id)
+
+    if name_q:
+        like = f"%{name_q.lower()}%"
+        q = q.filter(func.lower(Texture.texture_name).like(like))
+
+    if user_q:
+        like = f"%{user_q.lower()}%"
+        q = q.filter(func.lower(User.user_name).like(like))
+
+    if sort == 'name':
+        q = q.order_by(Texture.texture_name.asc(), Texture.texture_id.desc())
+    elif sort == 'uploader':
+        q = q.order_by(User.user_name.asc(), Texture.texture_id.desc())
+    else:  # default: newest first
+        q = q.order_by(Texture.texture_id.desc())
+
+    textures = q.all()
+
+    return render_template(
+        'home.html',
+        user=get_current_user(),
+        textures=textures,
+        filters={'name': name_q, 'user': user_q, 'sort': sort},
+        result_count=len(textures),
+    )
+
+@app.route('/texture/<texture_id>', methods=["POST", "GET"])
+def texture(texture_id):
+    texture = Texture.query.filter_by(texture_id=texture_id).first()
+    uploaded_user = User.query.filter_by(user_id=texture.texture_user_id).first()
+    return render_template('texture.html', user=get_current_user(), texture=texture, uploaded_user=uploaded_user)
 
 
 @app.route('/signup', methods=["POST", "GET"])
@@ -190,6 +228,24 @@ def upload():
                 return redirect('/')
 
     return render_template('upload.html', user=user, error=error)
+
+@app.route('/download/<int:texture_id>', methods=['GET', 'POST'])
+def download_image(texture_id):
+    texture = Texture.query.filter_by(texture_id=texture_id).first()
+    if not texture:
+        return "Texture not found", 404
+
+    # Extract filename from the stored path
+    if texture.texture_address.startswith('/static/images/'):
+        filename = texture.texture_address[len('/static/images/'):]
+    else:
+        filename = os.path.basename(texture.texture_address)
+    
+    file_path = os.path.join(STATIC_IMAGES_DIR, filename)
+    if not os.path.isfile(file_path):
+        return "File not found", 404
+    
+    return send_file(file_path, as_attachment=True, download_name=texture.texture_name)
 
 if __name__ == '__main__':
     with app.app_context():

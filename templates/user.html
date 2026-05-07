@@ -9,18 +9,20 @@
         <img src="/static/images/pfp.png">
         <div class="user-header-info">
             <h1 class="user-display-name">{{ profile_user.user_name }}</h1>
-            <p class="user-followers">{{ follower_count }} Followers</p>
-            <a> Follow </a>
+            <!-- <p class="user-followers">{{ follower_count }} Followers</p>
+             <a> Follow </a> -->
         </div>
         <div class="user-header-options">
             <a href="/logout">Logout</a>
-            <a href="/logout">Settings</a>
         </div>
     </div>
     <div class="user-textures">
         <div class="user_textures-header">
             <h1>Textures</h1>
             <div>
+            {% if user %}
+            <a href="/?user={{ user.user_name | urlencode }}">Show all</a>
+            {% endif %}
             <a href="/upload"> Upload</a>
             </div>
         </div>

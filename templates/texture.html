@@ -1,0 +1,12 @@
+{% extends "template.html" %}
+{% block title %}Texture Hub{% endblock %}
+{% block content %}
+<div class="texture-page">
+    <img src="{{ texture.texture_address | texture_url }}" alt="">
+    <p>{{texture.texture_name}}</p>
+    <p>Uploaded by {{ uploaded_user.user_name }}</p>
+    <form action="/download/{{texture.texture_id}}" method="post">
+        <input type="submit" value="Download">
+    </form>
+</div>  
+{% endblock %}
