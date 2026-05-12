@@ -2,7 +2,21 @@
 {% block title %}Texture Hub{% endblock %}
 {% block content %}
 <div class="collection-page">
-    <h1>{{ collection.collection_name}}</h1>
-    <p1>{{ collection_user.user_name}}</p1>
+    <section class="collection-hero">
+        <div class="collection-hero__intro">
+            <h1>{{ collection.collection_name }}</h1>
+            <p class="collection-author">Created by {{ collection_user.user_name }}</p>
+        </div>
+        <div class="collection-meta">
+            <span class="collection-meta__label">collection</span>
+            <span class="collection-meta__count">{{ textures|length }} Textures</span>
+        </div>
+    </section>
+
+    <div class="collection-textures">
+        {% for item in textures %}
+            {% include "texture_template.html" %}
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

@@ -79,48 +79,48 @@ class Texture_Collection(db.Model):
 
 
 # --- Routes ---
+@app.route('/')
+def route():
+    return redirect('/0')
 
-@app.route('/',methods=["POST", "GET"])
-def home():
-    # Prefer query-string filters (GET) so the URL is shareable/bookmarkable,
-    # but also accept POST payloads to keep older forms working.
-    src = request.args if request.method == 'GET' else request.form
-    name_q = (src.get('name') or '').strip()
-    user_q = (src.get('user') or '').strip()
-    sort = (src.get('sort') or 'new').strip().lower()
+@app.route('/<int:page>', methods=["POST", "GET"])
+def home(page=0):
 
-    q = db.session.query(Texture).outerjoin(User, User.user_id == Texture.texture_user_id)
+    items = None
 
-    if name_q:
-        like = f"%{name_q.lower()}%"
-        q = q.filter(func.lower(Texture.texture_name).like(like))
-
-    if user_q:
-        like = f"%{user_q.lower()}%"
-        q = q.filter(func.lower(User.user_name).like(like))
-
-    if sort == 'name':
-        q = q.order_by(Texture.texture_name.asc(), Texture.texture_id.desc())
-    elif sort == 'uploader':
-        q = q.order_by(User.user_name.asc(), Texture.texture_id.desc())
-    else:  # default: newest first
-        q = q.order_by(Texture.texture_id.desc())
-
-    textures = q.all()
+    match page:
+        case 0:
+            items = Texture.query.all()
+        case 1:
+            items = Collection.query.all()
 
     return render_template(
         'home.html',
         user=get_current_user(),
-        textures=textures,
-        filters={'name': name_q, 'user': user_q, 'sort': sort},
-        result_count=len(textures),
+        items=items,
+        page=page
     )
 
 @app.route('/texture/<texture_id>', methods=["POST", "GET"])
 def texture(texture_id):
+    user = get_current_user()
+    if user is None:
+        return redirect('/login')
+
+    collections = Collection.query.filter_by(collection_user_id=user.user_id).all()
+
+    if request.method == 'POST':
+        if 'collection' in request.form:
+            collection_index = request.form.get('collection')
+            collection = collections[int(collection_index)-1]
+            tc = Texture_Collection(texture_id=texture_id, collection_id=collection.collection_id)
+            db.session.add(tc)
+            db.session.commit()
+
     texture = Texture.query.filter_by(texture_id=texture_id).first()
     uploaded_user = User.query.filter_by(user_id=texture.texture_user_id).first()
-    return render_template('texture.html', user=get_current_user(), texture=texture, uploaded_user=uploaded_user)
+    
+    return render_template('texture.html', user=get_current_user(), texture=texture, uploaded_user=uploaded_user, collections=collections)
 
 
 @app.route('/signup', methods=["POST", "GET"])
@@ -265,11 +265,13 @@ def create_collection():
 def collection(_collection_id):
     user = get_current_user()
 
-
     collection = Collection.query.filter_by(collection_id = _collection_id).one()
     collection_user = User.query.filter_by(user_id = collection.collection_user_id).one()
+    
+    texture_ids = Texture_Collection.query.filter_by(collection_id = collection.collection_id).all()
+    textures = [Texture.query.filter_by(texture_id = tc.texture_id).one() for tc in texture_ids]
 
-    return render_template('collection.html', user=user, collection=collection, collection_user=collection_user)
+    return render_template('collection.html', user=user, collection=collection, collection_user=collection_user, textures=textures)
 
 @app.route('/download/<int:texture_id>', methods=['GET', 'POST'])
 def download_image(texture_id):

@@ -13,17 +13,8 @@
         <a href="/" class="logo">TEXTURE HUB</a>
 
         <nav class="nav">
-            {% if request.path == '/' %}
-                <a href="/">TEXTURES</a>
-                <a href="/collections">COLLECTIONS</a>
-            {% elif request.path == '/collections' %}
-                <a href="/">TEXTURES</a>
-                <a href="/collections">COLLECTIONS</a>
-            {% else %}
-                <a href="/">TEXTURES</a>
-                <a href="/collections">COLLECTIONS</a>
-            {% endif %}
-
+            <a href="/0" class="nav-btn {% if request.path == '/' %}nav-btn--active{% endif %}">TEXTURES</a>
+            <a href="/1" class="nav-btn {% if request.path == '/collections' %}nav-btn--active{% endif %}">COLLECTIONS</a>
         </nav>
 
         <nav class="auth">

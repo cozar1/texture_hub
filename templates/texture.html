@@ -12,18 +12,17 @@
                         <img class="texture-hero__img" src="{{ texture.texture_address | texture_url }}" alt="{{ texture.texture_name }}">
                     </div>
                     <form class="texture-hero__download" action="/download/{{texture.texture_id}}" method="post">
-                        <input type="submit" value="download">
+                        <input type="submit" value="download" name="download">
                     </form>
                     
                     <label for="cars">Add to Collection</label>
-                    <form>
-                        <select name="cars" id="cars">
-                            <option value="volvo">Volvo</option>
-                            <option value="saab">Saab</option>
-                            <option value="mercedes">Mercedes</option>
-                            <option value="audi">Audi</option>
+                    <form action="/texture/{{texture.texture_id}}" method="post">
+                        <select name="collection" id="cars">
+                            {% for item in collections %}
+                            <option value="{{ item.collection_id }}">{{ item.collection_name }}</option>
+                            {% endfor %}
                         </select>
-                        <input type="submit" value="+">
+                        <input type="submit" value="+" name="add_to_collection">
                     </form>
                 </div>
 

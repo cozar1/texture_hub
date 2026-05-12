@@ -1,5 +1,4 @@
 {% extends "template.html" %}
-
 {% block content %}
 
 <!-- Main Layout -->
@@ -7,34 +6,21 @@
 
     <!-- Sidebar -->
     <aside class="sidebar">
-        <form class="home-filters" method="get" action="/">
-            <div class="home-filters__row">
-                <label class="home-filters__label" for="filter-name">Name</label>
-                <input id="filter-name" class="home-filters__input" type="text" placeholder="e.g. bricks" name="name" value="{{ (filters.name if filters else '') }}">
-            </div>
-            <div class="home-filters__row">
-                <label class="home-filters__label" for="filter-user">Uploader</label>
-                <input id="filter-user" class="home-filters__input" type="text" placeholder="e.g. alice" name="user" value="{{ (filters.user if filters else '') }}">
-            </div>
-            <div class="home-filters__actions">
-                <input type="submit" value="Search">
-                <a class="home-filters__clear" href="/">Clear</a>
-            </div>
-            <div class="home-filters__meta">
-                <span>{{ result_count or 0 }} results</span>
-            </div>
-        </form>
     </aside>
 
     <!-- Content -->
     <section class="content">
         <div class="texture-grid">
-            {% for texture in textures %}
-            {% include "texture_template.html" %}
+            {% for item in items %}
+                {% if page == 0 %}
+                    {% include "texture_template.html" %}
+                {% elif page == 1 %}
+                    {% include "collection_template.html" %}
+                {% endif %}
             {% endfor %}
-            {% if not textures %}
+            {% if not items %}
                 <div class="home-empty">
-                    <div class="home-empty__title">No textures match your filters.</div>
+                    <div class="home-empty__title">No items match your filters.</div>
                     <div class="home-empty__hint">Try clearing the filters or searching for a shorter term.</div>
                 </div>
             {% endif %}
