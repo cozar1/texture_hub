@@ -178,9 +178,8 @@ def texture(texture_id):
 
     if request.method == 'POST':
         if 'collection' in request.form:
-            collection_index = request.form.get('collection')
-            collection = collections[int(collection_index)-1]
-            tc = Texture_Collection(texture_id=texture_id, collection_id=collection.collection_id)
+            collection_id = request.form.get('collection')
+            tc = Texture_Collection(texture_id=texture_id, collection_id=collection_id)
             db.session.add(tc)
             db.session.commit()
 
