@@ -25,6 +25,11 @@
     --pad-lg: 20px;
 }
 
+
+
+* {
+    image-rendering: pixelated;
+}
 /* Reset */
 body {
     margin: 0;

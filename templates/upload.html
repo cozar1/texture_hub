@@ -20,6 +20,9 @@
                 <label for="display-name">Display Name</label>
                 <input type="text" id="display-name" name="display_name" autocomplete="off" required maxlength="80"
                        value="{{ request.form.get('display_name', '') }}">
+                <label for="tags">Tags</label>
+                <input type="text" id="tags" name="tags" autocomplete="off" required maxlength="200"
+                       value="{{ request.form.get('tags', '') }}">
             </div>
 
             <div class="upload-submit-wrap">

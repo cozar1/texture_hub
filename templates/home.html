@@ -6,6 +6,17 @@
 
     <!-- Sidebar -->
     <aside class="sidebar">
+        <form class="filter" action="/{{ page }}" method="post">
+            <input type="text" name="search" placeholder="Search..." value="{{ search_query }}">
+            <input type="text" name="user" placeholder="User Name" value="{{ user_query }}">
+            <div class="filter-options">
+                
+                <label>
+                    <input type="text" name="tags" placeholder="Filter by tags..." value="{{ tag_query }}">
+                </label>
+                <button type="submit">Apply</button>
+            </div>
+        </form>
     </aside>
 
     <!-- Content -->

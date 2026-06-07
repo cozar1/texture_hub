@@ -8,6 +8,7 @@
         <section class="texture-panel">
             <div class="texture-hero">
                 <div class="texture-hero__preview">
+                    
                     <div class="texture-hero__frame">
                         <img class="texture-hero__img" src="{{ texture.texture_address | texture_url }}" alt="{{ texture.texture_name }}">
                     </div>
@@ -15,6 +16,8 @@
                         <input type="submit" value="download" name="download">
                     </form>
                     
+
+
                     <label for="cars">Add to Collection</label>
                     <form action="/texture/{{texture.texture_id}}" method="post">
                         <select name="collection" id="cars">
@@ -35,6 +38,11 @@
                         <div> </div>
                         <div> </div>
                     </div>
+                    {% if texture.texture_tags %}
+                        {% for tag in texture.texture_tags.split(',') %}
+                        <span class="texture-tag">{{ tag.strip() }}</span>
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </section>

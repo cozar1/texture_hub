@@ -1,0 +1,63 @@
+Category: Program testing
+Type: Expected/normal
+Test Case: Home page loads
+Input/Action: GET /0
+Expected result: Home page returns HTTP 200 and shows texture content area
+Actual result: HTTP 200
+Pass/Fail: Pass
+
+Category: Program testing
+Type: Expected/normal
+Test Case: Collection page loads
+Input/Action: GET /1
+Expected result: Collection page returns HTTP 200 and shows collection content area
+Actual result: HTTP 200
+Pass/Fail: Pass
+
+Category: Program testing
+Type: Expected/normal
+Test Case: Search texture by name
+Input/Action: POST /0 with search='Brick'
+Expected result: Texture "BrickWall" is displayed
+Actual result: "BrickWall" was displayed
+Pass/Fail: Pass
+
+Category: Program testing
+Type: Expected/normal
+Test Case: Filter textures by tag
+Input/Action: POST /0 with tags='tile'
+Expected result: Only texture "FloorTile" is displayed
+Actual result: "FloorTile" was displayed and "BrickWall" was not displayed
+Pass/Fail: Pass
+
+Category: Program testing
+Type: Invalid
+Test Case: Filter textures by unknown user
+Input/Action: POST /0 with user='charlie'
+Expected result: No matching textures are displayed
+Actual result: No items matched filters
+Pass/Fail: Pass
+
+Category: Program testing
+Type: Invalid
+Test Case: Filter collections by user name
+Input/Action: POST /1 with user='alice'
+Expected result: Collection "UrbanPack" is displayed
+Actual result: HTTP 200, but "UrbanPack" was not displayed
+Pass/Fail: Fail
+
+Category: SQL testing
+Type: Relational
+Test Case: Collection ownership link
+Input/Action: Store collection_user_id and filter collections by username
+Expected result: Collections owned by the named user are returned
+Actual result: Collection filter failed for username lookup
+Pass/Fail: Fail
+
+Category: SQL testing
+Type: Data validation
+Test Case: user name filter query handling
+Input/Action: POST /0 with user='alice'
+Expected result: Only textures uploaded by alice are returned
+Actual result: Only alice textures were returned
+Pass/Fail: Pass
