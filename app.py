@@ -3,6 +3,7 @@ import uuid
 
 from flask import Flask, render_template, request, redirect, send_file, session, abort
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.exceptions import HTTPException
 from werkzeug.utils import secure_filename
 from sqlalchemy import func
 
@@ -15,7 +16,7 @@ db = SQLAlchemy(app)
 
 STATIC_IMAGES_DIR = os.path.join(app.root_path, 'static', 'images')
 DEFAULT_TEXTURE_URL = '/static/images/texture.png'
-ALLOWED_IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
+ALLOWED_IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg'}
 
 
 def get_current_user():
@@ -80,6 +81,28 @@ class Texture_Collection(db.Model):
 
 
 # --- Routes ---
+def render_error(message, status_code=400):
+    return render_template('error.html', error=message), status_code
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_error('Page not found.', 404)
+
+@app.errorhandler(500)
+def internal_error(error):
+    return render_error('An internal server error occurred.', 500)
+
+@app.errorhandler(Exception)
+def handle_exception(error):
+    if isinstance(error, HTTPException):
+        return render_error(error.description, error.code)
+    return render_error('An unexpected error occurred.', 500)
+
+@app.route('/error')
+def error(_error=None):
+    message = _error if _error else 'An error occurred.'
+    return render_error(message)
+
 @app.route('/')
 def route():
     return redirect('/0')
@@ -112,51 +135,55 @@ def home(page=0):
         search_query = request.form.get('search', '').strip()
         tag_query = request.form.get('tags', '').strip()
         user_query = request.form.get('user', '').strip()
+    else:
+        search_query = request.args.get('search', '').strip()
+        tag_query = request.args.get('tags', '').strip()
+        user_query = request.args.get('user', '').strip()
 
-        if search_query:
-            lower_search = search_query.lower()
-            matched_by_name = [
+    if search_query and len(search_query) < 20:
+        lower_search = search_query.lower()
+        matched_by_name = [
+            item for item in page_items
+            if lower_search in (getattr(item, name_field, '') or '').lower()
+        ]
+    else:
+        matched_by_name = page_items
+
+    if user_query and owner_field and len(user_query) < 20:
+        owner = User.query.filter_by(user_name=user_query).first()
+        if owner:
+            matched_by_user = [
                 item for item in page_items
-                if lower_search in (getattr(item, name_field, '') or '').lower()
+                if getattr(item, owner_field, None) == owner.user_id
             ]
         else:
-            matched_by_name = page_items
+            matched_by_user = []
+    else:
+        matched_by_user = page_items
 
-        if user_query and owner_field:
-            owner = User.query.filter_by(user_name=user_query).first()
-            if owner:
-                matched_by_user = [
-                    item for item in page_items
-                    if getattr(item, owner_field, None) == owner.user_id
-                ]
-            else:
-                matched_by_user = []
-        else:
-            matched_by_user = page_items
-
-        if tags_field and tag_query:
-            selected_tags = [
+    if tags_field and tag_query and len(tag_query) < 20:
+        selected_tags = [
+            tag.strip().lower()
+            for tag in tag_query.split(',')
+            if tag.strip()
+        ]
+        matched_by_tags = []
+        for item in page_items:
+            raw_tags = getattr(item, tags_field, '') or ''
+            item_tag_list = [
                 tag.strip().lower()
-                for tag in tag_query.split(',')
+                for tag in raw_tags.split(',')
                 if tag.strip()
             ]
-            matched_by_tags = []
-            for item in page_items:
-                raw_tags = getattr(item, tags_field, '') or ''
-                item_tag_list = [
-                    tag.strip().lower()
-                    for tag in raw_tags.split(',')
-                    if tag.strip()
-                ]
-                if any(tag in item_tag_list for tag in selected_tags):
-                    matched_by_tags.append(item)
-        else:
-            matched_by_tags = page_items
+            if any(tag in item_tag_list for tag in selected_tags):
+                matched_by_tags.append(item)
+    else:
+        matched_by_tags = page_items
 
-        filtered_items = [
-            item for item in page_items
-            if item in matched_by_name and item in matched_by_tags and item in matched_by_user
-        ]
+    filtered_items = [
+        item for item in page_items
+        if item in matched_by_name and item in matched_by_tags and item in matched_by_user
+    ]
 
     return render_template(
         'home.html',
@@ -198,17 +225,17 @@ def signup():
         password = request.form.get('password')
 
         if username and password:
-            if User.query.filter_by(user_name=username).first():
-                error = "There is Already an Account with this Username"
-            elif User.query.filter_by(user_password=password).first():
-                existing = User.query.filter_by(user_password=password).first()
-                error = f"User {existing.user_name} Already has this password"
+            if len(username) > 20 or len(password) > 20:
+                error = "Username or Password is Too Long"
             else:
-                new_user = User(user_name=username, user_password=password, user_rating=0)
-                db.session.add(new_user)
-                db.session.commit()
-                session['user_id'] = new_user.user_id
-                return redirect("/")
+                if User.query.filter_by(user_name=username).first():
+                    error = "There is Already an Account with this Username"
+                else:
+                    new_user = User(user_name=username, user_password=password, user_rating=0)
+                    db.session.add(new_user)
+                    db.session.commit()
+                    session['user_id'] = new_user.user_id
+                    return redirect("/")
         else:
             error = "Please enter a Username & Password"
 
@@ -224,16 +251,16 @@ def login():
         password = request.form.get('password')
 
         if username and password:
-            _user = User.query.filter_by(user_name=username).first()
-            if _user:
-                if password == _user.user_password:
+            if len(username) > 20 or len(password) > 20:
+                error = "Username or Password is Too Long"
+            else:
+                _user = User.query.filter_by(user_name=username).first()
+                if _user and password == _user.user_password:
                     print("Logged in as " + username)
                     session['user_id'] = _user.user_id
                     return redirect("/")
                 else:
                     error = "Username or Password is Incorrect"
-            else:
-                error = "Username isn't Registered with any Account"
         else:
             error = "Please enter a Username & Password"
 
@@ -265,7 +292,8 @@ def user_profile(username):
         texture_more_total=13357,
         collection_more_total=13357,
         textures=textures,
-        collections=collections
+        collections=collections,
+        owner = profile_user == get_current_user()
     )
 
 
@@ -280,8 +308,13 @@ def upload():
     if request.method == 'POST':
         display_name = (request.form.get('display_name') or '').strip()
         file = request.files.get('image')
+        texture_tags = request.form.get('tags', '').strip()
 
-        if not display_name:
+        if len(display_name) > 20 or len(display_name) < 5:
+            error = "Name Must be Between 5 and 20 Characters Long"
+        elif len(texture_tags) > 100:
+             error = "Tags Must be Less Than 100 Characters Long"
+        elif not display_name:
             error = 'Please enter a display name.'
         elif not file or file.filename == '':
             error = 'Please choose an image file.'
@@ -291,7 +324,7 @@ def upload():
             original = secure_filename(file.filename)
             ext = os.path.splitext(original)[1].lower()
             if ext not in ALLOWED_IMAGE_EXTENSIONS:
-                error = 'Allowed types: PNG, JPEG, GIF, WebP.'
+                error = 'Allowed types: PNG, JPEG, JPG'
             else:
                 os.makedirs(STATIC_IMAGES_DIR, exist_ok=True)
                 stored_name = f'{uuid.uuid4().hex}{ext}'
@@ -302,7 +335,7 @@ def upload():
                     texture_name=display_name,
                     texture_address=url_path,
                     texture_user_id=user.user_id,
-                    texture_tags=request.form.get('tags', '').strip()
+                    texture_tags=texture_tags
                 )
                 db.session.add(texture)
                 db.session.commit()
@@ -312,6 +345,7 @@ def upload():
 
 @app.route('/create_collection', methods=['GET', 'POST'])
 def create_collection():
+    error = None
     user = get_current_user()
     if user is None:
         return redirect('/login')
@@ -319,14 +353,17 @@ def create_collection():
     if request.method == 'POST':
         display_name = (request.form.get('display_name') or '').strip()
 
-        if display_name:
+        if len(display_name) > 20 or len(display_name) < 5:
+            error = "Name Must Be Between 5 and 20 Characters Long"
+
+        elif display_name:
             collection = Collection(collection_name = display_name, collection_user_id = user.user_id)
             db.session.add(collection)
             db.session.commit()
 
-        return redirect('/')
+            return redirect('/')
 
-    return render_template('create_collection.html', user=user)
+    return render_template('create_collection.html', user=user, error=error)
 
 @app.route('/collection/<_collection_id>', methods=['GET', 'POST'])
 def collection(_collection_id):

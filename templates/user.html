@@ -20,10 +20,12 @@
         <div class="user_textures-header">
             <h1>Textures</h1>
             <div>
-            {% if user %}
-            <a href="/?user={{ user.user_name | urlencode }}">Show all</a>
+            {% if profile_user %}
+            <a href="/0?user={{ profile_user.user_name | urlencode }}">Show all</a>
             {% endif %}
+            {% if owner %}
             <a href="/upload"> Upload</a>
+            {% endif %}
             </div>
         </div>
         <div class="user-textures-row">
@@ -35,10 +37,12 @@
         <div class="user_textures-header">
             <h1>Collections</h1>
             <div>
-            {% if user %}
-            <a href="/?user={{ user.user_name | urlencode }}">Show all</a>
+            {% if profile_user %}
+            <a href="/1?user={{ profile_user.user_name | urlencode }}">Show all</a>
             {% endif %}
+            {% if owner %}
             <a href="/create_collection"> Create</a>
+            {% endif %}
             </div>
         </div>
         <div class="user-textures-row">
