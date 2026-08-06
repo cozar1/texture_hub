@@ -1,6 +1,3 @@
-<a href="/texture/{{item.texture_id}}">
-    <div class="texture-card">
-        <img src="{{ item.texture_address | texture_url }}" alt="">
-        <p>{{item.texture_name}}</p>
-    </div>
+<a href="/texture/{{ item.texture_id }}" class="item-container" style="background-image: url('{{ item.texture_address | texture_url }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="th-texture-thumb"></div>
 </a>

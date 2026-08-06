@@ -1,51 +1,46 @@
 {% extends "template.html" %}
 {% block title %}Texture Hub{% endblock %}
 {% block content %}
-<div class="texture-shell">
-    <aside class="texture-shell__sidebar" aria-hidden="true"></aside>
+<div class="item-container">
+    <div class="th-detail-image" style="background-image: url('{{ texture.texture_address | texture_url }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
 
-    <main class="texture-shell__main">
-        <section class="texture-panel">
-            <div class="texture-hero">
-                <div class="texture-hero__preview">
-                    
-                    <div class="texture-hero__frame">
-                        <img class="texture-hero__img" src="{{ texture.texture_address | texture_url }}" alt="{{ texture.texture_name }}">
-                    </div>
-                    <form class="texture-hero__download" action="/download/{{texture.texture_id}}" method="post">
-                        <input type="submit" value="download" name="download">
-                    </form>
-                    
+    <div class="th-detail-panel">
+        <div class="th-detail-title-row">
+            <h1 class="th-detail-title">{{ texture.texture_name }}</h1>
+            <div class="th-detail-author">Uploaded by <a class="th-signup-link" href="/user/{{ uploaded_user.user_name }}">{{ uploaded_user.user_name }}</a></div>
+        </div>
 
+        {% if texture.texture_tags %}
+        <div class="th-detail-tags-box">
+            {% for tag in texture.texture_tags.split(',') %}
+            <span class="th-nav-link" style="display: inline-block; margin: 4px 6px 0 0;">{{ tag.strip() }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
 
-                    <label for="cars">Add to Collection</label>
-                    <form action="/texture/{{texture.texture_id}}" method="post">
-                        <select name="collection" id="cars">
-                            {% for item in collections %}
-                            <option value="{{ item.collection_id }}">{{ item.collection_name }}</option>
-                            {% endfor %}
-                        </select>
-                        <input type="submit" value="+" name="add_to_collection">
-                    </form>
-                </div>
-
-                <div class="texture-hero__meta">
-                    <h1 class="texture-hero__title">{{ texture.texture_name }}</h1>
-                    <div class="texture-hero__sub">Uploaded by <a class="texture-hero__user" href="/user/{{ uploaded_user.user_name }}">{{ uploaded_user.user_name }}</a></div>
-
-                    <div class="texture-hero__blurb" aria-hidden="true">
-                        <div> </div>
-                        <div> </div>
-                        <div> </div>
-                    </div>
-                    {% if texture.texture_tags %}
-                        {% for tag in texture.texture_tags.split(',') %}
-                        <span class="texture-tag">{{ tag.strip() }}</span>
-                        {% endfor %}
-                    {% endif %}
-                </div>
+        <div class="th-collection-row">
+            <label class="th-label" for="collection-select">Add to Collection</label>
+        </div>
+        <form action="/texture/{{ texture.texture_id }}" method="post">
+            <div class="th-select-wrap">
+                <select class="th-select" name="collection" id="collection-select">
+                    {% for item in collections %}
+                    <option value="{{ item.collection_id }}">{{ item.collection_name }}</option>
+                    {% endfor %}
+                </select>
+                <i class="fas fa-chevron-down"></i>
             </div>
-        </section>
-    </main>
+            <button class="th-btn th-btn-round" type="submit" name="add_to_collection" value="+" aria-label="Add to collection"><i class="fas fa-plus"></i></button>
+        </form>
+    </div>
+
+    <div class="th-download-panel">
+        <div class="th-download-title">Download</div>
+        <form action="/download/{{ texture.texture_id }}" method="post">
+            <button class="th-btn th-download-btn" type="submit" name="download" value="download">
+                Download <i class="fas fa-download"></i>
+            </button>
+        </form>
+    </div>
 </div>
 {% endblock %}

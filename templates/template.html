@@ -3,35 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="/static/style.css">
     <title>{% block title %}Texture Hub{% endblock %}</title>
 </head>
-<body>
+<body class="th-body">
     {% if request.endpoint not in ('login', 'signup') %}
-    <!-- Top Bar -->
-    <header class="topbar">
-        <a href="/" class="logo">TEXTURE HUB</a>
+    <header class="th-navbar">
+        <a href="/" class="th-brand">TEXTURE HUB</a>
 
-        <nav class="nav">
-            <a href="/0" class="nav-btn {% if request.path == '/' %}nav-btn--active{% endif %}">TEXTURES</a>
-            <a href="/1" class="nav-btn {% if request.path == '/collections' %}nav-btn--active{% endif %}">COLLECTIONS</a>
-        </nav>
+        <div class="container">
+            <ul class="th-nav-links">
+                <li><a href="/0" class="th-nav-link {% if request.path == '/' %}is-active{% endif %}">TEXTURES</a></li>
+                <li><a href="/1" class="th-nav-link {% if request.path == '/collections' %}is-active{% endif %}">COLLECTIONS</a></li>
+                <li><a href="/0" class="th-nav-link {% if request.path == '/' %}is-active{% endif %}">GODOT</a></li>
+                <li><a href="/1" class="th-nav-link {% if request.path == '/collections' %}is-active{% endif %}">HELP</a></li>
+            </ul>
+        </div>
 
-        <nav class="auth">
-            {% if user %}
-                <a href="/upload">UPLOAD</a>
-                <a class="dropbtn" href="/user/{{ user.user_name }}">{{ user.user_name }}</a>
-                <div class="dropdown-content">
-                    <a href="/logout">Log Out</a>
-                </div>
-            {% else %}
-                <a href="/login">LOGIN</a>
-                <a href="/signup">SIGNUP</a>
-            {% endif %}
-        </nav>
+        <div class="container">
+            <nav class="th-nav-links">
+                {% if user %}
+                    <a class="th-nav-link" href="/user/{{ user.user_name }}">{{ user.user_name }}</a>
+                {% else %}
+                    <a href="/login" class="th-btn-login">LOGIN</a>
+                    <a href="/signup" class="th-btn-login">SIGNUP</a>
+                {% endif %}
+            </nav>
+        </div>
     </header>
     {% endif %}
-    {% block content %}
-    {% endblock %}
+    <main class="th-page">
+        {% block content %}
+        {% endblock %}
+    </main>
 </body>
 </html>

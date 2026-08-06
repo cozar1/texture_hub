@@ -5,10 +5,12 @@
         <p>{{error}}</p>
     </div>
 {% endif%}
-<div class="login-page">
-    
-    <form class="auth-card" action="/signup" method="post">
-        <pre>
+<div class="th-login-wrap">
+    <div class="th-login-card">
+        <h1 class="th-login-title">Sign up</h1>
+        <div class="th-login-box">
+            <form action="/signup" method="post">
+                <pre>
    _____ _                         
   / ____(_)                        
  | (___  _  __ _ _ __  _   _ _ __  
@@ -17,13 +19,15 @@
  |_____/|_|\__, |_| |_|\__,_| .__/ 
             __/ |           | |    
            |___/            |_|    
-        </pre>
-        <p>Username</p>
-        <input type="text" name="username">
-        <p>Password</p>
-        <input type="password" name="password">
-        <input type="submit" value="Sign up">
-    </form>
-    <p class="auth-switch">Already have an account? <a href="/login">Login</a></p>
+                </pre>
+                <label class="th-label" for="username">Username</label>
+                <input class="th-input" type="text" id="username" name="username">
+                <label class="th-label" for="password">Password</label>
+                <input class="th-input" type="password" id="password" name="password">
+                <button class="th-btn th-btn-block" type="submit">Sign up</button>
+            </form>
+        </div>
+        <p class="th-signup-row">Already have an account? <a class="th-signup-link" href="/login">Login</a></p>
+    </div>
 </div>
 {% endblock %}

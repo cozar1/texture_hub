@@ -1,43 +1,64 @@
 {% extends "template.html" %}
 {% block content %}
+<div class="th-textures-layout">
+    <aside class="th-sidebar">
+        <label class="th-label" for="search">Sort</label>
+        <div class="container">
+            <form action="/{{ page }}" method="post">
+                <div class="th-filter-group">
+                    <label class="th-label" for="search">Ascending</label>
+                    <input class="th-input" id="search" type="text" name="search" placeholder="Search..." value="{{ search_query }}">
+                </div>
+                <button class="th-btn th-btn-block" type="submit">Apply</button>
+            </form>
+        </div>
+        <label class="th-label" for="search">Filter</label>
+        <div class="container">
+            <form action="/{{ page }}" method="post">
+                <div class="th-filter-group">
+                    <label class="th-label" for="search">Search</label>
+                    <input class="th-input" id="search" type="text" name="search" placeholder="Search..." value="{{ search_query }}">
+                </div>
+                <div class="th-filter-group">
+                    <label class="th-label" for="user">User Name</label>
+                    <input class="th-input" id="user" type="text" name="user" placeholder="User Name" value="{{ user_query }}">
+                </div>
+                <div class="th-filter-group">
+                    <label class="th-label" for="tags">Tags</label>
+                    <input class="th-input" id="tags" type="text" name="tags" placeholder="Filter by tags..." value="{{ tag_query }}">
+                </div>
+                <button class="th-btn th-btn-block" type="submit">Apply</button>
+            </form>
+        </div>
 
-<!-- Main Layout -->
-<div class="main">
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <form class="filter" action="/{{ page }}" method="post">
-            <input type="text" name="search" placeholder="Search..." value="{{ search_query }}">
-            <input type="text" name="user" placeholder="User Name" value="{{ user_query }}">
-            <div class="filter-options">
-                
-                <label>
-                    <input type="text" name="tags" placeholder="Filter by tags..." value="{{ tag_query }}">
-                </label>
-                <button type="submit">Apply</button>
-            </div>
-        </form>
     </aside>
 
-    <!-- Content -->
-    <section class="content">
-        <div class="texture-grid">
-            {% for item in items %}
-                {% if page == 0 %}
-                    {% include "texture_template.html" %}
-                {% elif page == 1 %}
-                    {% include "collection_template.html" %}
-                {% endif %}
-            {% endfor %}
-            {% if not items %}
-                <div class="home-empty">
-                    <div class="home-empty__title">No items match your filters.</div>
-                    <div class="home-empty__hint">Try clearing the filters or searching for a shorter term.</div>
-                </div>
-            {% endif %}
+    
+    <section class="th-textures-main">
+        <div class="th-textures-header">
+            <h1>{% if page == 1 %}Collections{% else %}Textures{% endif %}</h1>
+            <div class="th-results-count">{{ items|length }} results</div>
         </div>
+        <div class="container">
+            <div class="th-grid-scroll">
+                <div class="th-texture-grid">
+                    {% for item in items %}
+                        {% if page == 0 %}
+                            {% include "texture_template.html" %}
+                        {% elif page == 1 %}
+                            {% include "collection_template.html" %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if not items %}
+                        <div class="th-detail-panel" style="grid-column: 1 / -1;">
+                            <div class="th-detail-title">No items match your filters.</div>
+                            <p class="th-detail-author">Try clearing the filters or searching for a shorter term.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    
     </section>
-
 </div>
-
 {% endblock %}

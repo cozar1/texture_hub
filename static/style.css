@@ -1,804 +1,593 @@
+/* =========================================================================
+   TEXTURE HUB — Stylesheet
+   Recreates 4 pages: Login, Textures (grid/filter), Texture Detail, Upload
+   Requires Font Awesome (icons) and a tileable background image at the
+   site root, referenced below as "/texture-bg.png"
+   ========================================================================= */
+
+@font-face {
+  font-family: "Lalezar-Regular";
+  src: url("/static/Lalezar-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* -------------------------------------------------------------------------
+   1. VARIABLES
+   ------------------------------------------------------------------------- */
 :root {
-    /* Colors */
-    --bg-main: #008080;
-    --bg-light: #ccc;
-    --bg-mid: #bbb;
-    --bg-dark: #999;
-    --bg-panel: #aaa;
+    --color_trans_white: #fdfdff79;
+    --color_trans_black: #00000071;
 
-    --text-main: #111;
-    --text-invert: #fff;
-
-    --border-light: #888;
-    --border-dark: #777;
-    --bevel-hi: #fff;
-    --bevel-lo: #555;
-    --bevel-mid: #111;
-
-    /* Effects */
-    --border-outset: 2px outset var(--border-light);
-    --border-inset: 1px outset var(--border-dark);
-
-    /* Layout */
-    --pad-sm: 5px;
-    --pad-md: 10px;
-    --pad-lg: 20px;
+  --th-bg-dark: #171b26;          /* page background base */
+  --th-navy: #262b3a;             /* navbar / dark panels */
+  --th-navy-light: #3a4155;       /* raised bevel light edge */
+  --th-navy-dark: #12151d;        /* recessed bevel dark edge */
+  --th-gray: #9a9ea8;             /* mid gray panel (cards, forms) */
+  --th-gray-light: #c4c7cf;       /* lighter gray panel */
+  --th-gray-dark: #6d707a;        /* button gray */
+  --th-white: #ffffff;
+  --th-orange: #f5a623;           /* accent / active state */
+  --th-orange-dark: #d98c12;
+  --th-text-dark: #1b1e26;
+  --th-border-dark: #000000;
+  
+  --th-radius-sm: 15px;
+  --th-radius-md: 25px;
+  --th-radius-lg: 35px;
+  --th-shadow-bevel: inset 1px 1px 0 var(--th-navy-light),
+                      inset -1px -1px 0 var(--th-border-dark);
+  --th-font: "Lalezar-Regular", "Segoe UI", "Arial", sans-serif;
+  --th-font-size-header: 75px;
+  --th-font-size-title: 55px;
+  --th-font-size-text: 25px;
 }
 
+/* -------------------------------------------------------------------------
+   2. GLOBAL / BACKGROUND
+   ------------------------------------------------------------------------- */
+* { box-sizing: border-box; }
 
-
-* {
-    image-rendering: pixelated;
-}
-/* Reset */
-body {
-    margin: 0;
-    font-family: monospace;
-    background: var(--bg-main);
-    color: var(--text-main);
-}
-
-/* Shared UI */
-button,
-.dropbtn,
-.texture-name,
-input[type="submit"] {
-    padding: var(--pad-sm) var(--pad-md);
-    background: var(--bg-mid);
-    border: 2px solid var(--bevel-mid);
-    border-top-color: var(--bevel-hi);
-    border-left-color: var(--bevel-hi);
-    border-right-color: var(--bevel-lo);
-    border-bottom-color: var(--bevel-lo);
-    cursor: pointer;
-    font-family: monospace;
+body.th-body {
+  position: relative;
+  margin: 0;
+  font-family: var(--th-font);
+  color: var(--th-white);
+  background-color: var(--th-bg-dark);
+  min-height: 100vh;
+  overflow: hidden; /* clips the oversized rotated layer below */
 }
 
-button:hover,
-.dropbtn:hover {
-    background: var(--bg-dark);
+body.th-body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none; /* don't block clicks on real content */
+
+  /* oversize + center so rotation doesn't leave gaps at the corners */
+  top: 50%;
+  left: 50%;
+  width: 150vmax;
+  height: 150vmax;
+  transform: translate(-50%, -50%) rotate(15deg);
+
+  background-image: url("/static/images/image_icon.png");
+  background-repeat: repeat;
+
+  /* smaller tile + correct aspect ratio: set ONE dimension, let the other be auto */
+  background-size: 90px auto;
+
+  /* transparency, isolated to just this layer */
+  opacity: 0.12;
 }
 
-a {
-    padding: var(--pad-sm) var(--pad-md);
-    background: var(--bg-mid);
-    border: 2px solid var(--bevel-mid);
-    border-top-color: var(--bevel-hi);
-    border-left-color: var(--bevel-hi);
-    border-right-color: var(--bevel-lo);
-    border-bottom-color: var(--bevel-lo);
-    cursor: pointer;
-    font-family: monospace;
-    color: black;
-    text-decoration: none;
+.th-navbar,
+.th-page {
+  position: relative;
+  z-index: 1;
 }
 
-button:hover,
-.dropbtn:hover {
-    background: var(--bg-dark);
-}
-
-input,
-.search {
-    background: var(--bg-mid);
-    border: 2px solid var(--bevel-mid);
-    border-top-color: var(--bevel-lo);
-    border-left-color: var(--bevel-lo);
-    border-right-color: var(--bevel-hi);
-    border-bottom-color: var(--bevel-hi);
-    font-family: monospace;
-}
-
-/* Top Bar */
-.topbar {
-    display: flex;
+.th-page {
     justify-content: space-between;
-    align-items: center;
-    padding: var(--pad-md);
-    background: var(--bg-light);
-    border-bottom: var(--border-outset);
-    gap: 14px;
+    width: 100%;
+  margin: 0 auto;
+  padding: 20px 24px 60px;
 }
 
-.logo {
-    margin: 0;
-    letter-spacing: 4px;
-    font-size: 42px;
-    line-height: 1;
-    padding: 0;
-    background: transparent;
-    border: 0;
+/* -------------------------------------------------------------------------
+   3. NAVBAR (shared across all 4 pages)
+   ------------------------------------------------------------------------- */
+
+.container {
+  background: var(--color_trans_white);
+  border: 7px solid var(--th-border-dark);
+  border-radius: var(--th-radius-sm);
+  padding: 10px 10px;
+  margin: 5px;
 }
 
-.nav {
+.item-container {
+    background: var(--color_trans_white);
+    border: 7px solid var(--th-border-dark);
+    border-radius: var(--th-radius-sm);
+    padding: 10px 10px;
+    margin: 5px;
+    aspect-ratio: 1 / 1;
+    max-width: 20rem;
+    border-radius: 20px;
+    background-image:
+    linear-gradient(45deg, #b9bcc3 25%, transparent 25%),
+    linear-gradient(-45deg, #b9bcc3 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #b9bcc3 75%),
+    linear-gradient(-45deg, transparent 75%, #b9bcc3 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    background-color: var(--th-gray-light);
+    -webkit-box-shadow: 0px 11px 0px 0px rgba(0,0,0,0.42); 
+    box-shadow: 0px 11px 0px 0px rgba(0,0,0,0.42);
+    image-rendering: pixelated; /* Standard */
+    image-rendering: crisp-edges; /* Fallback for Safari */
+}
+
+.th-navbar {
+    margin: 0px 20px 0px 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
+}
+
+.th-brand {
+  font-size: var(--th-font-size-header);
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--th-white);
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-decoration: none;
+text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
+}
+
+.th-nav-links {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  margin: 0 16px;
+  padding: 0;
+  flex: 1;
+text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
+}
+
+.th-nav-link {
+  color: var(--th-white);
+  font-weight: 700;
+  font-size: var(--th-font-size-title);
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+
+.th-nav-link:hover { filter: brightness(1.1); }
+
+.th-nav-link.is-active {
+  color: var(--th-orange);
+}
+
+.th-btn-login {
+  background: var(--th-gray-dark);
+  border: 2px solid var(--th-border-dark);
+  border-radius: var(--th-radius-sm);
+  box-shadow: var(--th-shadow-bevel);
+  color: var(--th-orange);
+  font-weight: 800;
+  font-size: var(--th-font-size-text);
+  text-transform: uppercase;
+  padding: 10px 22px;
+  cursor: pointer;
+}
+
+/* -------------------------------------------------------------------------
+   4. SHARED FORM ELEMENTS / BUTTONS
+   ------------------------------------------------------------------------- */
+.th-label {
+  display: block;
+  font-weight: 800;
+  font-size: var(--th-font-size-title);
+  color: var(--th-white);
+  margin: 14px 0 6px;
+    text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
+}
+
+.th-input,
+.th-textarea,
+.th-select {
+  width: 100%;
+  border: 1px solid var(--th-border-dark);
+  border-radius: var(--th-radius-sm);
+  background: var(--th-white);
+  color: var(--th-text-dark);
+  font-family: var(--th-font);
+  font-size: var(--th-font-size-text);
+  font-weight: 600;
+  padding: 8px 10px;
+}
+
+.th-input::placeholder,
+.th-textarea::placeholder { color: var(--th-text-dark); opacity: 0.55; }
+
+.th-input.is-accent,
+.th-textarea.is-accent {
+  background: var(--th-orange);
+}
+
+.th-input.is-accent::placeholder { color: var(--th-text-dark); opacity: 0.7; }
+
+.th-textarea {
+  resize: none;
+  min-height: 80px;
+  line-height: 1.4;
+}
+
+.th-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--th-gray-light);
+  font-weight: 700;
+  padding-right: 30px;
+  position: relative;
+  cursor: pointer;
+}
+
+/* wrap a .th-select in .th-select-wrap to place the fa-chevron-down icon */
+.th-select-wrap { position: relative; }
+.th-select-wrap i.fa-chevron-down {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--th-text-dark);
 }
 
-.nav-btn {
-    display: inline-block;
-    padding: 4px 14px;
-    background: var(--bg-mid);
-    border: var(--border-inset);
-    font-family: monospace;
-    text-decoration: none;
-    color: #000;
-    letter-spacing: 0.5px;
+.th-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--th-gray-dark);
+  border: 2px solid var(--th-border-dark);
+  border-radius: var(--th-radius-sm);
+  box-shadow: var(--th-shadow-bevel);
+  color: var(--th-white);
+  font-weight: 800;
+  cursor: pointer;
 }
 
-.nav-btn--active {
-    background: var(--bg-light);
-    border: 2px solid var(--bevel-mid);
-    border-top-color: var(--bevel-lo);
-    border-left-color: var(--bevel-lo);
-    border-right-color: var(--bevel-hi);
-    border-bottom-color: var(--bevel-hi);
-}
-
-.nav-btn--disabled {
-    opacity: 0.85;
-    cursor: default;
-    pointer-events: none;
-}
-
-.auth {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-}
-
-.auth a {
-    padding: 4px 12px;
-}
-
-/* Layout */
-.main {
-    display: flex;
-    height: calc(100vh - 60px);
-}
-
-/* Sidebar */
-.sidebar {
-    width: 250px;
-    background: var(--bg-panel);
-    padding: var(--pad-md);
-    border-right: var(--border-outset);
-    overflow-y: auto;
-    position: sticky;
-    top: 60px;
-    height: calc(100vh - 60px);
-}
-
-.search {
-    width: 100%;
-    height: 25px;
-    margin-bottom: var(--pad-md);
-}
-
-/* Home filters */
-.home-filters {
-    display: grid;
-    gap: 10px;
-}
-
-.home-filters__row {
-    display: grid;
-    gap: 6px;
-}
-
-.home-filters__label {
-    font-size: 12px;
-}
-
-.home-filters__input,
-.home-filters__select {
-    width: 100%;
-    box-sizing: border-box;
-    height: 32px;
-    padding: 6px 8px;
-}
-
-.home-filters__actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    align-items: center;
-}
-
-.home-filters__clear {
-    text-align: center;
-}
-
-.home-filters__meta {
-    font-size: 12px;
-    opacity: 0.85;
-}
-
-.home-empty {
-    grid-column: 1 / -1;
-    padding: 16px;
-    background: var(--bg-mid);
-    border: var(--border-outset);
-    max-width: 520px;
-}
-
-.home-empty__title {
-    font-weight: bold;
-    margin-bottom: 6px;
-}
-
-.home-empty__hint {
-    font-size: 12px;
-    opacity: 0.9;
-}
-
-/* Grid helpers */
-.filters,
-.ratios {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--pad-sm);
-    font-size: 12px;
-}
-
-/* Sliders */
-.slider-group {
-    margin-bottom: var(--pad-md);
-}
-
-.slider-group label {
-    display: block;
-    font-size: 12px;
-}
-
-.slider-group input {
-    width: 100%;
-}
-
-.slider-group span {
-    float: right;
-    font-size: 11px;
-}
-
-/* Content */
-.content {
-    flex: 1;
-    min-width: 0;
-    padding: var(--pad-lg);
-    overflow-y: auto;
-    background: var(--bg-main);
-}
-
-.collection-page {
-    min-height: calc(100vh - 60px);
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 30px 24px 40px;
-    background: var(--bg-light);
-    box-sizing: border-box;
-}
-
-.collection-hero {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 26px;
-    align-items: start;
-    margin-bottom: 30px;
-}
-
-.collection-hero__intro h1 {
-    margin: 0;
-    font-size: clamp(2.5rem, 4vw, 4.8rem);
-    line-height: 1;
-    letter-spacing: 0.02em;
-}
-
-.collection-author {
-    margin-top: 10px;
-    color: #555;
-    font-size: 1rem;
-    opacity: 0.85;
-}
-
-.collection-meta {
-    text-align: right;
-    align-self: start;
-}
-
-.collection-meta__label {
-    display: block;
-    text-transform: uppercase;
-    letter-spacing: 0.25em;
-    font-size: 0.75rem;
-    opacity: 0.55;
-}
-
-.collection-meta__count {
-    display: block;
-    margin-top: 6px;
-    font-size: 1.35rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-}
-
-.collection-textures {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(180px, 1fr));
-    gap: 22px;
-    justify-items: center;
-}
-
-.collection-textures a {
-    display: block;
-    width: 100%;
-    color: inherit;
-    text-decoration: none;
-}
-
-.collection-textures .texture-card {
-    width: 100%;
-    max-width: 220px;
-}
-
-.collection-textures .texture-card img {
-    border-radius: 2px;
-}
-
-@media (max-width: 1040px) {
-    .collection-textures {
-        grid-template-columns: repeat(3, minmax(160px, 1fr));
-    }
-}
-
-@media (max-width: 760px) {
-    .collection-hero {
-        grid-template-columns: 1fr;
-        text-align: left;
-    }
-
-    .collection-meta {
-        text-align: left;
-        margin-top: 16px;
-    }
-
-    .collection-textures {
-        grid-template-columns: repeat(2, minmax(140px, 1fr));
-    }
-}
-
-/* Texture detail page (aesthetic only) */
-.texture-shell {
-    min-height: calc(100vh - 60px);
-    background: var(--bg-main);
-    padding: 24px 0 34px;
-    box-sizing: border-box;
-    display: block;
-}
-
-.texture-shell__sidebar {
-    display: none;
-    min-height: calc(100vh - 60px);
-}
-
-.texture-shell__main {
-    background: transparent;
-    padding: 0;
-}
-
-.texture-panel {
-    width: min(980px, calc(100% - 32px));
-    margin: 0 auto;
-    background: var(--bg-light);
-    border: 2px solid var(--bevel-mid);
-    border-top-color: var(--bevel-hi);
-    border-left-color: var(--bevel-hi);
-    border-right-color: var(--bevel-lo);
-    border-bottom-color: var(--bevel-lo);
-}
-
-.texture-hero {
-    display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 26px;
-    align-items: start;
-    padding: 18px 18px 22px;
-}
-
-.texture-hero__frame {
-    background: #666;
-    border: 2px solid var(--bevel-mid);
-    border-top-color: var(--bevel-hi);
-    border-left-color: var(--bevel-hi);
-    border-right-color: var(--bevel-lo);
-    border-bottom-color: var(--bevel-lo);
-}
-
-.texture-hero__img {
-    width: 100%;
-    display: block;
-    aspect-ratio: 1;
-    object-fit: contain;
-    background: #444;
-}
+.th-btn:hover { filter: brightness(1.08); }
 
-.texture-hero__download {
-    margin-top: 10px;
-    text-align: center;
+.th-btn-block {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 14px;
+  font-size: var(--th-font-size-text);
+  text-transform: uppercase;
+  margin-top: 18px;
 }
 
-.texture-hero__download input[type="submit"] {
-    width: 100%;
-    max-width: 220px;
-    padding: 6px 10px;
-    background: var(--bg-mid);
-    text-transform: lowercase;
+.th-btn-round {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  padding: 0;
+  font-size: var(--th-font-size-text);
 }
 
-.texture-hero__title {
-    margin: 0;
-    font-size: 48px;
-    line-height: 1;
-    letter-spacing: 1px;
-    font-weight: 700;
+/* -------------------------------------------------------------------------
+   5. PAGE 1 — LOGIN
+   ------------------------------------------------------------------------- */
+.th-login-wrap {
+  display: flex;
+  justify-content: center;
+  padding-top: 40px;
 }
 
-.texture-hero__sub {
-    margin-top: 8px;
-    font-size: 16px;
+.th-login-card {
+  width: 420px;
+  text-align: center;
 }
 
-.texture-hero__user {
-    padding: 0;
-    background: transparent;
-    border: 0;
-    text-decoration: underline;
+.th-login-title {
+  font-size: var(--th-font-size-title);
+  font-weight: 800;
+  margin-bottom: 18px;
 }
 
-.texture-hero__blurb {
-    margin-top: 18px;
-    max-width: 520px;
-    font-size: 14px;
-    line-height: 1.55;
-    opacity: 0.9;
+.th-login-box {
+  background: var(--th-gray);
+  border: 1px solid var(--th-border-dark);
+  border-radius: var(--th-radius-md);
+  padding: 20px 24px 28px;
+  text-align: left;
 }
 
-.texture-hero__blurb div {
-    height: 14px;
-}
+.th-login-box .th-label { color: var(--th-text-dark); }
 
-.texture-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 200px);
-    gap: var(--pad-md);
-    justify-content: start;
-    align-content: start;
+.th-signup-row {
+  margin-top: 16px;
+  font-weight: 700;
+  color: var(--th-white);
 }
 
-/* Card */
-.texture-card {
-    width: 100%;
-    max-width: 200px;
-    box-sizing: border-box;
-    text-align: center;
+.th-signup-link {
+  color: var(--th-orange);
+  text-decoration: none;
+  font-weight: 800;
+  margin-left: 4px;
 }
 
-.texture-card-link {
-    display: block;
-    padding: 0;
-    border: 2px solid var(--bevel-mid);
-    border-top-color: var(--bevel-hi);
-    border-left-color: var(--bevel-hi);
-    border-right-color: var(--bevel-lo);
-    border-bottom-color: var(--bevel-lo);
+/* -------------------------------------------------------------------------
+   6. PAGE 2 — TEXTURES GRID / FILTER SIDEBAR
+   ------------------------------------------------------------------------- */
+.th-textures-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+  max-width: 1800px;
+  margin: 0 auto;
 }
 
-.texture-card img {
-    width: 100%;
-    display: block;
-    aspect-ratio: 1;
-    object-fit: cover;
+.th-sidebar {
+  width: 100%;
 }
 
-.texture-name {
-    width: 100%;
-    margin-top: var(--pad-sm);
-    text-align: center;
-    background: none;
-    border: none;
+.th-sidebar-title {
+  font-weight: 800;
+  font-size: var(--th-font-size-text);
+  margin-bottom: 6px;
 }
 
-/* Dropdown */
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
+.th-filter-group { margin-bottom: 14px; }
 
-.auth .dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 100%;
-    margin-top: 6px;
-    background: #f1f1f1;
-    min-width: 160px;
+.th-filter-tags-box {
+  min-height: 90px;
+  background: var(--th-white);
+  border-radius: var(--th-radius-sm);
+  border: 1px solid var(--th-border-dark);
+  padding: 8px 10px;
 }
 
-.auth .dropdown-content a {
-    display: block;
-    padding: 12px 16px;
-    color: black;
-    text-decoration: none;
+.th-textures-main {
+  padding: 18px 20px;
+  min-width: 0;
 }
 
-.auth .dropdown-content a:hover {
-    background: #ddd;
+.th-textures-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
 }
 
-.dropbtn:hover + .dropdown-content,
-.auth .dropdown-content:hover {
-    display: block;
+.th-textures-header h1 {
+  margin: 0;
+  font-size: var(--th-font-size-title);
 }
 
-/* Error */
-.error {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: var(--pad-md);
-    color: var(--text-invert);
-    border: 1px dashed red;
+.th-results-count {
+  font-weight: 700;
+  color: var(--th-white);
+  font-size: var(--th-font-size-text);
 }
 
-/* Login */
-.login-page {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 40px 16px;
-    font-size: 18px;
-    background: var(--bg-main);
-    font-family: monospace;
+.th-grid-scroll {
+  display: flex;
+  gap: 8px;
 }
 
-.auth-card {
-    width: min(420px, 100%);
-    padding: 24px 20px;
-    background: var(--bg-mid);
-    border: var(--border-outset);
-    text-align: center;
+.th-texture-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
 }
 
-.login-page input[type="text"],
-.login-page input[type="password"] {
-    width: 100%;
-    max-width: 340px;
-    height: 36px;
-    margin: 8px auto 14px;
-    padding: 8px;
-    background: #fff;
-    border: 1px solid var(--border-dark);
+.th-texture-card {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  background: var(--th-navy);
+  border: 3px solid var(--th-border-dark);
+  border-radius: var(--th-radius-sm);
+  overflow: hidden;
+  cursor: pointer;
 }
 
-.user-page {
-    display:block;
-    min-height: calc(100vh - 60px);
-    width: min(1120px, calc(100% - 48px));
-    margin: 24px auto;
-    background: var(--bg-light);
-    border: 2px solid var(--bevel-mid);
-    border-top-color: var(--bevel-hi);
-    border-left-color: var(--bevel-hi);
-    border-right-color: var(--bevel-lo);
-    border-bottom-color: var(--bevel-lo);
+.th-texture-card.is-selected {
+  border-color: var(--th-orange);
 }
 
-.user-banner {
-    width: 100%;
-    height: clamp(140px, 18vw, 220px);
-    overflow: hidden;
+.th-texture-name {
+  text-align: center;
+  font-weight: 800;
+  font-size: var(--th-font-size-title);
+  padding: 8px 0;
+  color: var(--th-white);
+  text-decoration: none;
 }
 
-.user-banner img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-    object-position: center;
-}
+.th-texture-card.is-selected .th-texture-name { color: var(--th-orange); }
 
-.user-header {
-    display: grid;
-    grid-template-columns: 1fr 1fr 3fr;
-    padding: 1rem;
+/* custom scrollbar track shown at right of grid */
+.th-scrollbar-track {
+  width: 10px;
+  border-radius: 6px;
+  background: var(--th-navy-dark);
 }
 
-.user-header {
-    display: grid;
-    grid-template-columns: 1fr 1fr 3fr;
-    padding: 1rem;
+.th-scrollbar-thumb {
+  width: 10px;
+  height: 70px;
+  border-radius: 6px;
+  background: var(--th-gray-dark);
 }
 
-.user-header-info {
-    display:block
+/* -------------------------------------------------------------------------
+   7. PAGE 3 — TEXTURE DETAIL
+   ------------------------------------------------------------------------- */
+.th-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 24px;
+  align-items: start;
 }
 
-.user-header-options {
-    display: block;
-    text-align: right;
+.th-detail-image {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border-radius: var(--th-radius-sm);
+  background-image:
+    linear-gradient(45deg, #b9bcc3 25%, transparent 25%),
+    linear-gradient(-45deg, #b9bcc3 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #b9bcc3 75%),
+    linear-gradient(-45deg, transparent 75%, #b9bcc3 75%);
+  background-size: 24px 24px;
+  background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+  background-color: var(--th-gray-light);
+  image-rendering: pixelated; /* Standard */
+  image-rendering: crisp-edges; /* Fallback for Safari */
 }
 
-.user-header-options a {
-    display: inline-block; /* Ensure children are not full-width block elements */
+.th-detail-panel {
+  background: var(--th-gray);
+  border-radius: var(--th-radius-md);
+  padding: 18px 22px;
+  color: var(--th-text-dark);
 }
 
-.user-textures {
-    margin: 1rem;
+.th-detail-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
 }
 
-.user-textures-row {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    gap: var(--pad-md);
-    align-items: stretch;
-    overflow-x: auto;
-    padding-bottom: var(--pad-sm);
-}
+.th-detail-title { font-size: var(--th-font-size-title); font-weight: 800; margin: 0; }
+.th-detail-author { font-weight: 700; font-size: var(--th-font-size-text); }
 
-.user-textures-row .texture-card--user-row {
-    width: 160px;
-    max-width: 160px;
-    flex: 0 0 auto;
-}
+.th-detail-panel .th-label { color: var(--th-text-dark); }
 
-.user_textures-header {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center; /* Vertically centers children */
+.th-detail-tags-box {
+  min-height: 90px;
+  background: var(--th-white);
+  border-radius: var(--th-radius-sm);
+  padding: 8px 10px;
+  font-weight: 600;
+  line-height: 1.5;
 }
 
-.user_textures-header div {
-    display: inline-block;
-    text-align: right;
+.th-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
 }
 
-.hidden {
-    display: none !important;
-}
+.th-stat-label { font-weight: 800; white-space: nowrap; }
 
-/* Upload texture page */
-.upload-page {
-    min-height: calc(100vh - 60px);
-    box-sizing: border-box;
-    padding: 28px max(24px, 8vw);
-    background: var(--bg-main);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+.th-stat-track {
+  flex: 1;
+  height: 2px;
+  background: var(--th-text-dark);
 }
 
-.upload-column {
-    width: 100%;
-    max-width: 520px;
-    background: var(--bg-light);
-    border: 2px solid var(--bevel-mid);
-    border-top-color: var(--bevel-hi);
-    border-left-color: var(--bevel-hi);
-    border-right-color: var(--bevel-lo);
-    border-bottom-color: var(--bevel-lo);
-    padding: 28px 32px 36px;
-}
+.th-stat-value { font-weight: 800; }
 
-.upload-title {
-    margin: 0 0 24px;
-    text-align: center;
-    font-size: 1.6rem;
-    font-weight: bold;
-    letter-spacing: 0.02em;
+.th-collection-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
 }
 
-.upload-error {
-    margin: 0 0 16px;
-    padding: 10px;
-    border: 1px dashed #900;
-    background: #ebb;
-    color: #300;
-    text-align: center;
-}
+.th-collection-row .th-select-wrap { flex: 1; }
 
-.upload-form {
-    margin: 0;
+.th-download-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 180px;
 }
 
-.upload-dropzone {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 240px;
-    aspect-ratio: 1;
-    max-height: min(360px, 70vw);
-    margin: 0 auto;
-    background: #555;
-    border: 2px solid var(--bevel-mid);
-    border-top-color: var(--bevel-hi);
-    border-left-color: var(--bevel-hi);
-    border-right-color: var(--bevel-lo);
-    border-bottom-color: var(--bevel-lo);
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    box-sizing: border-box;
-}
+.th-download-title { font-weight: 800; font-size: var(--th-font-size-text); }
 
-.upload-dropzone--drag {
-    outline: 3px dashed var(--bg-light);
-    outline-offset: -8px;
+.th-download-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  font-size: var(--th-font-size-text);
 }
 
-.upload-placeholder {
-    color: var(--text-invert);
-    font-size: 1.15rem;
-    pointer-events: none;
+/* -------------------------------------------------------------------------
+   8. PAGE 4 — UPLOAD
+   ------------------------------------------------------------------------- */
+.th-upload-title {
+  text-align: center;
+  font-size: var(--th-font-size-title);
+  font-weight: 800;
+  margin-bottom: 18px;
 }
 
-.upload-preview {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background: #444;
+.th-upload-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
 }
 
-.upload-field-row {
-    margin-top: 22px;
+.th-upload-dropzone {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border-radius: var(--th-radius-sm);
+  background-color: var(--th-gray-light);
 }
 
-.upload-field-row label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
+.th-btn-select-image {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px;
+  font-size: var(--th-font-size-text);
+  text-align: center;
+  text-transform: none;
 }
 
-.upload-field-row input[type="text"] {
-    width: 100%;
-    max-width: 320px;
-    padding: 10px 12px;
-    background: #555;
-    color: var(--text-invert);
-    border: 1px solid #000;
-    font-family: monospace;
-    font-size: 14px;
-}
+.th-upload-form .th-label { color: var(--th-white); }
 
-.upload-submit-wrap {
-    margin-top: 32px;
-    text-align: center;
+.th-upload-submit-wrap {
+  margin-top: 24px;
 }
 
-.upload-submit {
-    padding: 12px 36px;
-    font-family: monospace;
-    font-size: 1rem;
-    font-weight: bold;
-    background: var(--bg-light);
-    color: var(--text-main);
-    border: 2px outset #fff;
-    border-right-color: #555;
-    border-bottom-color: #555;
-    cursor: pointer;
+.th-btn-upload {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  font-size: var(--th-font-size-text);
+  text-transform: uppercase;
+  text-align: center;
 }
 
-.upload-submit:active {
-    border-style: inset;
-    border-right-color: #fff;
-    border-bottom-color: #fff;
-    border-top-color: #555;
-    border-left-color: #555;
+/* -------------------------------------------------------------------------
+   9. RESPONSIVE
+   ------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .th-textures-layout,
+  .th-detail-layout,
+  .th-upload-layout {
+    grid-template-columns: 1fr;
+  }
+  .th-texture-grid { grid-template-columns: repeat(2, 1fr); }
+  .th-nav-links { flex-wrap: wrap; }
 }
