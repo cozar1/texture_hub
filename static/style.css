@@ -56,7 +56,8 @@ body.th-body {
   color: var(--th-white);
   background-color: var(--th-bg-dark);
   min-height: 100vh;
-  overflow: hidden; /* clips the oversized rotated layer below */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body.th-body::before {
@@ -93,7 +94,7 @@ body.th-body::before {
     justify-content: space-between;
     width: 100%;
   margin: 0 auto;
-  padding: 20px 24px 60px;
+  padding: 0px 24px 60px;
 }
 
 /* -------------------------------------------------------------------------
@@ -129,45 +130,79 @@ body.th-body::before {
     box-shadow: 0px 11px 0px 0px rgba(0,0,0,0.42);
     image-rendering: pixelated; /* Standard */
     image-rendering: crisp-edges; /* Fallback for Safari */
+    transition-duration: 0.2s;
+}
+
+.item-container:hover {
+  border: 7px solid var(--th-orange);
+  scale: 110%;
+  transition-duration: 0.2s;
 }
 
 .th-navbar {
-    margin: 0px 20px 0px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  width: min(100%, calc(100vw - 40px));
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 0 0px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .th-brand {
-  font-size: var(--th-font-size-header);
+  font-size: clamp(1.75rem, 4vw, var(--th-font-size-header));
   font-weight: 800;
   letter-spacing: 0.5px;
   color: var(--th-white);
   text-transform: uppercase;
   white-space: nowrap;
   text-decoration: none;
-text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
+  flex-shrink: 0;
+  text-shadow: 0px 4px 0px rgba(0,0,0,0.51);
+}
+
+.th-navbar > .container {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 5px 0;
+  display: flex;
+  align-items: center;
+}
+
+.th-navbar > .container:last-child {
+  justify-content: flex-end;
 }
 
 .th-nav-links {
   display: flex;
-  gap: 8px;
+  align-items: center;
   list-style: none;
-  margin: 0 16px;
+  margin: 0;
   padding: 0;
-  flex: 1;
-text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+  white-space: nowrap;
+  text-shadow: 0px 4px 0px rgba(0,0,0,0.51);
 }
 
 .th-nav-link {
   color: var(--th-white);
   font-weight: 700;
-  font-size: var(--th-font-size-title);
+  font-size: clamp(1rem, 2.4vw, var(--th-font-size-title));
   text-transform: uppercase;
   text-decoration: none;
-  padding: 10px 18px;
+  padding: 0px 18px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
 }
+
+
 
 .th-nav-link:hover { filter: brightness(1.1); }
 
@@ -177,7 +212,7 @@ text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
 
 .th-btn-login {
   background: var(--th-gray-dark);
-  border: 2px solid var(--th-border-dark);
+  border: 4px solid var(--th-border-dark);
   border-radius: var(--th-radius-sm);
   box-shadow: var(--th-shadow-bevel);
   color: var(--th-orange);
@@ -186,6 +221,13 @@ text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
   text-transform: uppercase;
   padding: 10px 22px;
   cursor: pointer;
+  transition-duration: 0.2s;
+}
+
+.th-btn-login:hover {
+  border: 7px solid var(--th-orange);
+  scale: 110%;
+  transition-duration: 0.2s;
 }
 
 /* -------------------------------------------------------------------------
@@ -194,24 +236,34 @@ text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
 .th-label {
   display: block;
   font-weight: 800;
-  font-size: var(--th-font-size-title);
+  font-size: clamp(1rem, 1.6vw, var(--th-font-size-title));
   color: var(--th-white);
-  margin: 14px 0 6px;
-    text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
+  margin: 10px 0 4px;
+  text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
 }
 
 .th-input,
 .th-textarea,
 .th-select {
   width: 100%;
-  border: 1px solid var(--th-border-dark);
+  border: 4px solid var(--th-border-dark);
   border-radius: var(--th-radius-sm);
   background: var(--th-white);
   color: var(--th-text-dark);
   font-family: var(--th-font);
-  font-size: var(--th-font-size-text);
+  font-size: 1rem;
   font-weight: 600;
-  padding: 8px 10px;
+  padding: 6px 8px;
+}
+
+.th-select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--th-text-dark) 50%),
+                    linear-gradient(135deg, var(--th-text-dark) 50%, transparent 50%);
+  background-position: calc(100% - 16px) calc(50% - 3px), calc(100% - 10px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 32px;
 }
 
 .th-input::placeholder,
@@ -257,15 +309,21 @@ text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
   justify-content: center;
   gap: 8px;
   background: var(--th-gray-dark);
-  border: 2px solid var(--th-border-dark);
+  border: 4px solid var(--th-border-dark);
   border-radius: var(--th-radius-sm);
   box-shadow: var(--th-shadow-bevel);
   color: var(--th-white);
   font-weight: 800;
   cursor: pointer;
+  transition-duration: 0.2s;
 }
 
-.th-btn:hover { filter: brightness(1.08); }
+.th-btn:hover { 
+  filter: brightness(1.08); 
+  scale: 110%;
+  border: 4px solid var(--th-orange);
+  transition-duration: 0.2s;
+}
 
 .th-btn-block {
   display: block;
@@ -333,8 +391,8 @@ text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
    ------------------------------------------------------------------------- */
 .th-textures-layout {
   display: grid;
-  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-  gap: 28px;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 20px;
   align-items: start;
   max-width: 1800px;
   margin: 0 auto;
@@ -342,6 +400,9 @@ text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
 
 .th-sidebar {
   width: 100%;
+  position: sticky;
+  top: 16px;
+  align-self: start;
 }
 
 .th-sidebar-title {
@@ -350,13 +411,15 @@ text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
   margin-bottom: 6px;
 }
 
-.th-filter-group { margin-bottom: 14px; }
+.th-filter-group { 
+  margin-bottom: 10px; 
+}
 
 .th-filter-tags-box {
-  min-height: 90px;
+  min-height: 70px;
   background: var(--th-white);
   border-radius: var(--th-radius-sm);
-  border: 1px solid var(--th-border-dark);
+  border: 4px solid var(--th-border-dark);
   padding: 8px 10px;
 }
 
@@ -590,4 +653,10 @@ text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
   }
   .th-texture-grid { grid-template-columns: repeat(2, 1fr); }
   .th-nav-links { flex-wrap: wrap; }
+  .th-navbar {
+    justify-content: center;
+  }
+  .th-navbar > .container {
+    width: 100%;
+  }
 }

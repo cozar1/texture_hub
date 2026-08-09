@@ -2,35 +2,33 @@
 {% block content %}
 <div class="th-textures-layout">
     <aside class="th-sidebar">
-        <label class="th-label" for="search">Sort</label>
-        <div class="container">
-            <form action="/{{ page }}" method="post">
+        <form action="/{{ page }}" method="post">
+            <label class="th-label" for="sort">Sort</label>
+            <div class="container">
                 <div class="th-filter-group">
-                    <label class="th-label" for="search">Ascending</label>
+                    <select class="th-input th-select" id="sort" name="sort">
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="name_asc">Name A-Z</option>
+                        <option value="name_desc">Name Z-A</option>
+                    </select>
+                </div>
+            </div>
+
+            <label class="th-label" for="search">Filter</label>
+            <div class="container">
+                <div class="th-filter-group">
                     <input class="th-input" id="search" type="text" name="search" placeholder="Search..." value="{{ search_query }}">
                 </div>
-                <button class="th-btn th-btn-block" type="submit">Apply</button>
-            </form>
-        </div>
-        <label class="th-label" for="search">Filter</label>
-        <div class="container">
-            <form action="/{{ page }}" method="post">
                 <div class="th-filter-group">
-                    <label class="th-label" for="search">Search</label>
-                    <input class="th-input" id="search" type="text" name="search" placeholder="Search..." value="{{ search_query }}">
-                </div>
-                <div class="th-filter-group">
-                    <label class="th-label" for="user">User Name</label>
                     <input class="th-input" id="user" type="text" name="user" placeholder="User Name" value="{{ user_query }}">
                 </div>
                 <div class="th-filter-group">
-                    <label class="th-label" for="tags">Tags</label>
                     <input class="th-input" id="tags" type="text" name="tags" placeholder="Filter by tags..." value="{{ tag_query }}">
                 </div>
-                <button class="th-btn th-btn-block" type="submit">Apply</button>
-            </form>
-        </div>
-
+            </div>
+            <button class="th-btn th-btn-block" type="submit">Apply</button>
+        </form>
     </aside>
 
     

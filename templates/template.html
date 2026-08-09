@@ -24,7 +24,7 @@
         <div class="container">
             <nav class="th-nav-links">
                 {% if user %}
-                    <a class="th-nav-link" href="/user/{{ user.user_name }}">{{ user.user_name }}</a>
+                    <a class="th-nav-link th-user-link" href="/user/{{ user.user_name }}">{{ user.user_name }}</a>
                 {% else %}
                     <a href="/login" class="th-btn-login">LOGIN</a>
                     <a href="/signup" class="th-btn-login">SIGNUP</a>
