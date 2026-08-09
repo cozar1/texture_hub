@@ -1,24 +1,10 @@
 {% extends "template.html" %}
 {% block title %}Texture Hub{% endblock %}
 {% block content %}
-<div class="item-container">
+<div class="th-texture-page">
+    <div class="th-item-page-img-column">
     <div class="th-detail-image" style="background-image: url('{{ texture.texture_address | texture_url }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
-
-    <div class="th-detail-panel">
-        <div class="th-detail-title-row">
-            <h1 class="th-detail-title">{{ texture.texture_name }}</h1>
-            <div class="th-detail-author">Uploaded by <a class="th-signup-link" href="/user/{{ uploaded_user.user_name }}">{{ uploaded_user.user_name }}</a></div>
-        </div>
-
-        {% if texture.texture_tags %}
-        <div class="th-detail-tags-box">
-            {% for tag in texture.texture_tags.split(',') %}
-            <span class="th-nav-link" style="display: inline-block; margin: 4px 6px 0 0;">{{ tag.strip() }}</span>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        <div class="th-collection-row">
+    <div class="th-collection-row">
             <label class="th-label" for="collection-select">Add to Collection</label>
         </div>
         <form action="/texture/{{ texture.texture_id }}" method="post">
@@ -34,13 +20,33 @@
         </form>
     </div>
 
-    <div class="th-download-panel">
-        <div class="th-download-title">Download</div>
+
+    <div class="container">
+        <div class="th-detail-title-row">
+            <h1 class="th-detail-title">{{ texture.texture_name }}</h1>
+            <div class="th-detail-author">Uploaded by <a class="th-signup-link" href="/user/{{ uploaded_user.user_name }}">{{ uploaded_user.user_name }}</a></div>
+        </div>
+
+        
+        {% if texture.texture_tags %}
+        <label class="th-label">Tags</label>
+        <div class="container">
+            {% for tag in texture.texture_tags.split(',') %}
+            <span class="th-detail-tag" style="display: inline-block; margin: 4px 6px 0 0;">{{ tag.strip() }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+            <div class="th-download-panel">
+        <div class="th-label">Downloads</div>
         <form action="/download/{{ texture.texture_id }}" method="post">
             <button class="th-btn th-download-btn" type="submit" name="download" value="download">
                 Download <i class="fas fa-download"></i>
             </button>
         </form>
     </div>
+    </div>
+
+
 </div>
 {% endblock %}

@@ -1,38 +1,28 @@
 {% extends "template.html" %}
 {% block title %}Upload Texture — Texture Hub{% endblock %}
 {% block content %}
-<div class="th-login-wrap">
-    <div class="th-login-card">
-        <h1 class="th-upload-title">Upload Texture</h1>
-
-        {% if error %}
-        <div class="th-login-box">
-            <p class="th-detail-author" role="alert">{{ error }}</p>
+<form class="th-upload-form" action="/upload" method="post" enctype="multipart/form-data">
+    <h1 class="th-upload-title">Upload</h1>
+    <div class="th-upload">      
+        <div class="th-detail-image">
+            <label class="th-upload-dropzone" id="upload-zone" for="file-input">
+                <span id="upload-placeholder">Upload</span>
+                <img id="upload-preview" class="upload-preview hidden" alt="Preview">
+                <input type="file" id="file-input" name="image" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
+            </label>
         </div>
-        {% endif %}
-
-        <div class="th-login-box">
-            <form class="th-upload-form" action="/upload" method="post" enctype="multipart/form-data">
-                <label class="th-upload-dropzone" id="upload-zone" for="file-input">
-                    <span id="upload-placeholder">Upload</span>
-                    <img id="upload-preview" class="upload-preview hidden" alt="Preview">
-                    <input type="file" id="file-input" name="image" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
-                </label>
-
-                <label class="th-label" for="display-name">Display Name</label>
-                <input class="th-input" type="text" id="display-name" name="display_name" autocomplete="off" required maxlength="80"
-                       value="{{ request.form.get('display_name', '') }}">
-                <label class="th-label" for="tags">Tags</label>
-                <input class="th-input" type="text" id="tags" name="tags" autocomplete="off"
-                       value="{{ request.form.get('tags', '') }}">
-
-                <div class="th-upload-submit-wrap">
-                    <button class="th-btn th-btn-upload" type="submit">Upload</button>
-                </div>
-            </form>
+        <div class="container">
+            <label class="th-label" for="display-name">Display Name</label>
+            <input class="th-input" type="text" id="display-name" name="display_name" autocomplete="off" required maxlength="80"
+                    value="{{ request.form.get('display_name', '') }}">
+            <label class="th-label" for="tags">Tags</label>
+            <input class="th-input" type="text" id="tags" name="tags" autocomplete="off"
+                    value="{{ request.form.get('tags', '') }}">
         </div>
+
     </div>
-</div>
+        <button class="th-upload-btn" type="submit">Upload</button>
+</form>
 
 <script>
 (function () {

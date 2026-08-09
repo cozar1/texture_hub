@@ -49,6 +49,61 @@
    ------------------------------------------------------------------------- */
 * { box-sizing: border-box; }
 
+.th-upload {
+  margin: 0 auto;
+  max-width: 1080px;
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr);
+  gap: 5rem;
+  align-items: start;
+}
+
+.th-user-page {
+  margin: 0rem 20rem 0rem 20rem;
+}
+
+.th-upload-btn {
+  background: var(--th-gray-dark);
+  border: 4px solid var(--th-border-dark);
+  border-radius: var(--th-radius-sm);
+  box-shadow: var(--th-shadow-bevel);
+  color: var(--th-orange);
+  font-weight: 800;
+  font-size: var(--th-font-size-text);
+  text-transform: uppercase;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition-duration: 0.2s;
+  display: block;
+  width: fit-content;
+  margin: 2rem auto 0;
+  padding: 16px 28px;
+  font-size: var(--th-font-size-text);
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.th-upload-btn:hover {
+  border: 7px solid var(--th-orange);
+  scale: 110%;
+  transition-duration: 0.2s;
+}
+
+
+
+
+.th-texture-page {
+  margin: 10rem 20rem 0rem 20rem;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 5rem;
+}
+
+
+.th-detail-tag{
+  font-size: var(--th-font-size-text);
+}
+
 body.th-body {
   position: relative;
   margin: 0;
@@ -91,11 +146,14 @@ body.th-body::before {
 }
 
 .th-page {
-    justify-content: space-between;
-    width: 100%;
+  justify-content: space-between;
+  width: 100%;
   margin: 0 auto;
   padding: 0px 24px 60px;
 }
+
+
+
 
 /* -------------------------------------------------------------------------
    3. NAVBAR (shared across all 4 pages)
@@ -164,11 +222,12 @@ body.th-body::before {
 }
 
 .th-navbar > .container {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-width: 0;
   margin: 5px 0;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .th-navbar > .container:last-child {
@@ -239,7 +298,6 @@ body.th-body::before {
   font-size: clamp(1rem, 1.6vw, var(--th-font-size-title));
   color: var(--th-white);
   margin: 10px 0 4px;
-  text-shadow: 0px 7px 0px rgba(0,0,0,0.51);
 }
 
 .th-input,
@@ -424,7 +482,6 @@ body.th-body::before {
 }
 
 .th-textures-main {
-  padding: 18px 20px;
   min-width: 0;
 }
 
@@ -453,7 +510,7 @@ body.th-body::before {
 .th-texture-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 20px;
 }
 
@@ -512,16 +569,23 @@ body.th-body::before {
   width: 100%;
   border-radius: var(--th-radius-sm);
   background-image:
-    linear-gradient(45deg, #b9bcc3 25%, transparent 25%),
-    linear-gradient(-45deg, #b9bcc3 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #b9bcc3 75%),
-    linear-gradient(-45deg, transparent 75%, #b9bcc3 75%);
+  linear-gradient(45deg, #b9bcc3 25%, transparent 25%),
+  linear-gradient(-45deg, #b9bcc3 25%, transparent 25%),
+  linear-gradient(45deg, transparent 75%, #b9bcc3 75%),
+  linear-gradient(-45deg, transparent 75%, #b9bcc3 75%);
   background-size: 24px 24px;
   background-position: 0 0, 0 12px, 12px -12px, -12px 0;
   background-color: var(--th-gray-light);
   image-rendering: pixelated; /* Standard */
   image-rendering: crisp-edges; /* Fallback for Safari */
+  transition-duration: 0.2s;
+  background-color: var(--th-gray-light);
+  -webkit-box-shadow: 0px 11px 0px 0px rgba(0,0,0,0.42); 
+  box-shadow: 0px 11px 0px 0px rgba(0,0,0,0.42);
+    border: 7px solid var(--th-border-dark);
+    border-radius: var(--th-radius-sm);
 }
+
 
 .th-detail-panel {
   background: var(--th-gray);
@@ -615,6 +679,19 @@ body.th-body::before {
   width: 100%;
   border-radius: var(--th-radius-sm);
   background-color: var(--th-gray-light);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.th-upload-dropzone img,
+.th-upload-dropzone .upload-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .th-btn-select-image {
