@@ -59,7 +59,16 @@
 }
 
 .th-user-page {
-  margin: 0rem 20rem 0rem 20rem;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.th-user-page .th-texture-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(14rem, 20rem));
+  gap: 20px;
+  justify-content: center;
 }
 
 .th-upload-btn {
@@ -93,10 +102,11 @@
 
 
 .th-texture-page {
-  margin: 10rem 20rem 0rem 20rem;
   display: grid;
   grid-template-columns: 2fr 3fr;
   gap: 5rem;
+  width: 100%;
+  margin: 0 auto;
 }
 
 
@@ -141,15 +151,15 @@ body.th-body::before {
 
 .th-navbar,
 .th-page {
+  margin: 0 auto;
   position: relative;
   z-index: 1;
 }
 
+/* Option 1: just use fit-content as the whole value */
 .th-page {
-  justify-content: space-between;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0px 24px 60px;
+  width: fit-content;
+  min-width: 50rem;
 }
 
 
@@ -167,34 +177,58 @@ body.th-body::before {
   margin: 5px;
 }
 
-.item-container {
-    background: var(--color_trans_white);
-    border: 7px solid var(--th-border-dark);
-    border-radius: var(--th-radius-sm);
-    padding: 10px 10px;
-    margin: 5px;
-    aspect-ratio: 1 / 1;
-    max-width: 20rem;
-    border-radius: 20px;
-    background-image:
+.item {
+  width: 100%;
+  display: grid;
+  place-items: center;
+  position: relative;
+  background: var(--color_trans_white);
+  border: 7px solid var(--th-border-dark);
+  border-radius: var(--th-radius-sm);
+  padding: 10px;
+  aspect-ratio: 1 / 1;
+  max-width: 20rem;
+  background-image:
     linear-gradient(45deg, #b9bcc3 25%, transparent 25%),
     linear-gradient(-45deg, #b9bcc3 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, #b9bcc3 75%),
     linear-gradient(-45deg, transparent 75%, #b9bcc3 75%);
-    background-size: 20px 20px;
-    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
-    background-color: var(--th-gray-light);
-    -webkit-box-shadow: 0px 11px 0px 0px rgba(0,0,0,0.42); 
-    box-shadow: 0px 11px 0px 0px rgba(0,0,0,0.42);
-    image-rendering: pixelated; /* Standard */
-    image-rendering: crisp-edges; /* Fallback for Safari */
-    transition-duration: 0.2s;
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+  background-color: var(--th-gray-light);
+  -webkit-box-shadow: 0px 11px 0px 0px rgba(0,0,0,0.42); 
+  box-shadow: 0px 11px 0px 0px rgba(0,0,0,0.42);
+  image-rendering: pixelated; /* Standard */
+  image-rendering: crisp-edges; /* Fallback for Safari */
+  transition-duration: 0.2s;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
 }
 
-.item-container:hover {
+.item:hover {
   border: 7px solid var(--th-orange);
   scale: 110%;
   transition-duration: 0.2s;
+}
+
+.item .item-name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.8rem 0.9rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--th-white);
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.item .item-thumb {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .th-navbar {
@@ -270,10 +304,6 @@ body.th-body::before {
 }
 
 .th-btn-login {
-  background: var(--th-gray-dark);
-  border: 4px solid var(--th-border-dark);
-  border-radius: var(--th-radius-sm);
-  box-shadow: var(--th-shadow-bevel);
   color: var(--th-orange);
   font-weight: 800;
   font-size: var(--th-font-size-text);
@@ -281,6 +311,7 @@ body.th-body::before {
   padding: 10px 22px;
   cursor: pointer;
   transition-duration: 0.2s;
+  text-decoration: none;
 }
 
 .th-btn-login:hover {
@@ -353,12 +384,14 @@ body.th-body::before {
 /* wrap a .th-select in .th-select-wrap to place the fa-chevron-down icon */
 .th-select-wrap { position: relative; }
 .th-select-wrap i.fa-chevron-down {
+  display: flex;
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
   color: var(--th-text-dark);
+  width:f fit-content;
 }
 
 .th-btn {
@@ -449,10 +482,9 @@ body.th-body::before {
    ------------------------------------------------------------------------- */
 .th-textures-layout {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  grid-template-columns: 1fr 3fr;
   gap: 20px;
   align-items: start;
-  max-width: 1800px;
   margin: 0 auto;
 }
 
@@ -505,13 +537,15 @@ body.th-body::before {
 .th-grid-scroll {
   display: flex;
   gap: 8px;
+  width: 100%;
 }
 
 .th-texture-grid {
   flex: 1;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  justify-content: center;
 }
 
 .th-texture-card {
@@ -602,6 +636,18 @@ body.th-body::before {
 
 .th-detail-title { font-size: var(--th-font-size-title); font-weight: 800; margin: 0; }
 .th-detail-author { font-weight: 700; font-size: var(--th-font-size-text); }
+
+.th-detail-title {
+  font-size: clamp(1.75rem, 4vw, var(--th-font-size-header));
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--th-white);
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-decoration: none;
+  flex-shrink: 0;
+  text-shadow: 0px 4px 0px rgba(0,0,0,0.51);
+}
 
 .th-detail-panel .th-label { color: var(--th-text-dark); }
 

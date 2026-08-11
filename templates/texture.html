@@ -8,15 +8,15 @@
             <label class="th-label" for="collection-select">Add to Collection</label>
         </div>
         <form action="/texture/{{ texture.texture_id }}" method="post">
-            <div class="th-select-wrap">
-                <select class="th-select" name="collection" id="collection-select">
+            <div>
+                <select class="container" name="collection" id="collection-select">
                     {% for item in collections %}
                     <option value="{{ item.collection_id }}">{{ item.collection_name }}</option>
                     {% endfor %}
                 </select>
-                <i class="fas fa-chevron-down"></i>
+                <button class="th-btn th-btn-round" type="submit" name="add_to_collection" value="+" aria-label="Add to collection"><i class="fas fa-plus"></i></button>
             </div>
-            <button class="th-btn th-btn-round" type="submit" name="add_to_collection" value="+" aria-label="Add to collection"><i class="fas fa-plus"></i></button>
+            
         </form>
     </div>
 
@@ -24,8 +24,9 @@
     <div class="container">
         <div class="th-detail-title-row">
             <h1 class="th-detail-title">{{ texture.texture_name }}</h1>
-            <div class="th-detail-author">Uploaded by <a class="th-signup-link" href="/user/{{ uploaded_user.user_name }}">{{ uploaded_user.user_name }}</a></div>
+            
         </div>
+        <div class="th-detail-author">Uploaded by <a class="th-signup-link" href="/user/{{ uploaded_user.user_name }}">{{ uploaded_user.user_name }}</a></div>
 
         
         {% if texture.texture_tags %}
