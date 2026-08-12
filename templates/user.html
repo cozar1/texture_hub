@@ -8,15 +8,13 @@
             <div class="th-detail-author">{{ textures|length }} textures · {{ collections|length }} collections</div>
         </div>
         {% if owner %}
-        <form action="/logout" method="post" style="margin-top:12px;">
-            <button class="th-btn-login" type="submit">Logout</button>
-        </form>
         {% endif %}
     </div>
+        <a href="/logout" class="th-user-option" type="submit">Logout</a>
 
     <div class="th-textures-header" style="margin-top: 24px;">
         <h1>Textures</h1>
-        <a class="th-nav-link" href="/upload">Upload</a>
+        <a class="th-user-option" href="/upload">Upload</a>
     </div>
     <div class="container">
     <div class="th-texture-grid" style="margin-top: 24px;">
@@ -25,11 +23,11 @@
         {% endfor %}
     </div>
     </div>
-    <a class="th-nav-link" href="/0?user={{ profile_user.user_name | urlencode }}">Show all textures</a>
+    <a class="th-user-option" href="/0?user={{ profile_user.user_name | urlencode }}">Show all textures</a>
 
     <div class="th-textures-header" style="margin-top: 24px;">
         <h1>Collections</h1>
-        <a class="th-nav-link" href="/create_collection">Create collection</a>
+        <a class="th-user-option" href="/create_collection">Create collection</a>
     </div>
     <div class="container">
     <div class="th-texture-grid">

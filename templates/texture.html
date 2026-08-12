@@ -7,17 +7,47 @@
     <div class="th-collection-row">
             <label class="th-label" for="collection-select">Add to Collection</label>
         </div>
-        <form action="/texture/{{ texture.texture_id }}" method="post">
-            <div>
-                <select class="container" name="collection" id="collection-select">
+        <form action="/texture/{{ texture.texture_id }}" method="post" style="display:flex; gap:10px; align-items:center;">
+            <div class="th-select-wrap" style="flex:1;">
+                <select class="th-input th-select" name="collection" id="collection-select">
                     {% for item in collections %}
                     <option value="{{ item.collection_id }}">{{ item.collection_name }}</option>
                     {% endfor %}
                 </select>
-                <button class="th-btn th-btn-round" type="submit" name="add_to_collection" value="+" aria-label="Add to collection"><i class="fas fa-plus"></i></button>
+                <i class="fas fa-chevron-down"></i>
             </div>
-            
+            <button id="collection-toggle-button" class="th-btn" type="submit" aria-label="Add to collection" style="width:auto; min-width:48px; padding:8px 12px;">
+                <i class="fas fa-plus"></i>
+            </button>
         </form>
+        <script>
+            (function () {
+                const select = document.getElementById('collection-select');
+                const button = document.getElementById('collection-toggle-button');
+                if (!select || !button) {
+                    return;
+                }
+
+                const textureCollectionIds = {{ texture_collection_ids|tojson }};
+
+                function syncButtonState() {
+                    const selectedCollectionId = Number(select.value);
+                    const inCollection = textureCollectionIds.includes(selectedCollectionId);
+
+                    button.innerHTML = inCollection
+                        ? '<i class="fas fa-minus"></i>'
+                        : '<i class="fas fa-plus"></i>';
+                    button.setAttribute(
+                        'aria-label',
+                        inCollection ? 'Remove from collection' : 'Add to collection'
+                    );
+                    button.title = inCollection ? 'Remove from collection' : 'Add to collection';
+                }
+
+                select.addEventListener('change', syncButtonState);
+                syncButtonState();
+            })();
+        </script>
     </div>
 
 
@@ -39,7 +69,7 @@
         {% endif %}
 
             <div class="th-download-panel">
-        <div class="th-label">Downloads</div>
+        <div class="th-label"> </div>
         <form action="/download/{{ texture.texture_id }}" method="post">
             <button class="th-btn th-download-btn" type="submit" name="download" value="download">
                 Download <i class="fas fa-download"></i>

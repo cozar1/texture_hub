@@ -175,6 +175,9 @@ body.th-body::before {
   border-radius: var(--th-radius-sm);
   padding: 10px 10px;
   margin: 5px;
+  font-size: var(--th-font-size-text);
+  font-family: var(--th-font);
+  color: white;
 }
 
 .item {
@@ -326,7 +329,7 @@ body.th-body::before {
 .th-label {
   display: block;
   font-weight: 800;
-  font-size: clamp(1rem, 1.6vw, var(--th-font-size-title));
+  font-size: var(--th-font-size-text);
   color: var(--th-white);
   margin: 10px 0 4px;
 }
@@ -407,6 +410,12 @@ body.th-body::before {
   font-weight: 800;
   cursor: pointer;
   transition-duration: 0.2s;
+  width: 100%;
+}
+
+.th-submit-button{
+  all: unset;
+  cursor: pointer;
 }
 
 .th-btn:hover { 
@@ -636,6 +645,17 @@ body.th-body::before {
 
 .th-detail-title { font-size: var(--th-font-size-title); font-weight: 800; margin: 0; }
 .th-detail-author { font-weight: 700; font-size: var(--th-font-size-text); }
+
+.th-user-option {
+  font-size: var(--th-font-size-text);
+  text-decoration: none;
+  color: var(--th-orange);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-block;
+}
 
 .th-detail-title {
   font-size: clamp(1.75rem, 4vw, var(--th-font-size-header));

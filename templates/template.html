@@ -16,19 +16,18 @@
             <ul class="th-nav-links">
                 <li><a href="/0" class="th-nav-link {% if request.path == '/' %}is-active{% endif %}">TEXTURES</a></li>
                 <li><a href="/1" class="th-nav-link {% if request.path == '/collections' %}is-active{% endif %}">COLLECTIONS</a></li>
-                <li><a href="/0" class="th-nav-link {% if request.path == '/' %}is-active{% endif %}">GODOT</a></li>
                 <li><a href="/1" class="th-nav-link {% if request.path == '/collections' %}is-active{% endif %}">HELP</a></li>
             </ul>
         </div>
 
         <div class="container">
-            <nav class="th-nav-links">
+            <ul class="th-nav-links">
                 {% if user %}
-                    <a class="th-nav-link th-user-link" href="/user/{{ user.user_name }}">{{ user.user_name }}</a>
-                {% else %}
-                    <a href="/login" class="th-btn-login">LOGIN</a>
+                    <li><a class="th-nav-link" href="/user/{{ user.user_name }}">{{ user.user_name }}</a></li>
+                {% else %}         
+                    <li><a href="/login" class="th-nav-link {% if request.path == '/' %}is-active{% endif %}">Login</a></li>
                 {% endif %}
-            </nav>
+            </ul>
         </div>
     </header>
     {% endif %}
