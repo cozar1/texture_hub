@@ -4,7 +4,7 @@
 <div class="th-detail-panel">
     <div class="th-detail-title-row">
         <h1 class="th-detail-title">{{ collection.collection_name }}</h1>
-        <div class="th-detail-author">Created by {{ collection_user.user_name }}</div>
+        <div class="th-detail-author">Uploaded by <a class="th-signup-link" href="/user/{{ collection_user.user_name }}">{{ collection_user.user_name }}</a></div>
     </div>
     <div class="th-collection-row">
         <span class="th-stat-label">Collection</span>

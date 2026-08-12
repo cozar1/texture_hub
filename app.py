@@ -79,6 +79,17 @@ class Texture_Collection(db.Model):
     texture_id = db.Column(db.Integer, db.ForeignKey('Texture.texture_id'))
     collection_id = db.Column(db.Integer, db.ForeignKey('Collection.collection_id'))
 
+class Texture_Views(db.Model):
+    __tablename__ = 'Texture_Views'
+    texture_views_id = db.Column(db.Integer, primary_key=True)
+    texture_id = db.Column(db.Integer, db.ForeignKey('Texture.texture_id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('User.user_id'))
+
+class Texture_Downloads(db.Model):
+    __tablename__ = 'Texture_Downloads'
+    texture_downloads_id = db.Column(db.Integer, primary_key=True)
+    texture_id = db.Column(db.Integer, db.ForeignKey('Texture.texture_id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('User.user_id'))
 
 # --- Routes ---
 def render_error(message, status_code=400):
@@ -233,13 +244,30 @@ def texture(texture_id):
         for c in collections
     }
 
+    current_user = get_current_user()
+
+    already_viewed = Texture_Views.query.filter_by(
+        texture_id=texture_id,
+        user_id=current_user.user_id
+    ).first() is not None
+
+    if not already_viewed:
+        tv = Texture_Views(texture_id=texture_id, user_id=current_user.user_id)
+        db.session.add(tv)
+        db.session.commit()  # commit here, or bundle with your other commit below
+
+    views = Texture_Views.query.filter_by(texture_id=texture_id).count()
+    downloads = Texture_Downloads.query.filter_by(texture_id=texture_id).count()
+
     return render_template(
         'texture.html',
         user=user,
         texture=texture,
         uploaded_user=uploaded_user,
         collections=collections,
-        collections_contained=collections_contained
+        collections_contained=collections_contained,
+        views = views,
+        downloads=downloads,
     )
 
 @app.route('/signup', methods=["POST", "GET"])
@@ -398,6 +426,7 @@ def collection(_collection_id):
     collection = Collection.query.filter_by(collection_id = _collection_id).one()
     collection_user = User.query.filter_by(user_id = collection.collection_user_id).one()
     
+
     texture_ids = Texture_Collection.query.filter_by(collection_id = collection.collection_id).all()
     textures = [Texture.query.filter_by(texture_id = tc.texture_id).one() for tc in texture_ids]
 
@@ -418,7 +447,22 @@ def download_image(texture_id):
     file_path = os.path.join(STATIC_IMAGES_DIR, filename)
     if not os.path.isfile(file_path):
         return "File not found", 404
-    
+
+    current_user = get_current_user()
+    print(current_user.user_id)
+
+    already_downloaded = Texture_Downloads.query.filter_by(
+        texture_id=texture_id,
+        user_id=current_user.user_id
+    ).first() is not None
+
+    print("Already Downloaded : "+str(already_downloaded))
+
+    if not already_downloaded:
+        td = Texture_Downloads(texture_id=texture_id, user_id=current_user.user_id)
+        db.session.add(td)
+        db.session.commit() 
+
     return send_file(file_path, as_attachment=True, download_name=texture.texture_name)
 
 if __name__ == '__main__':

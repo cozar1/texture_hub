@@ -633,10 +633,11 @@ body.th-body::before {
 
 
 .th-detail-panel {
-  background: var(--th-gray);
-  border-radius: var(--th-radius-md);
+  background: var(--color_trans_white);
   padding: 18px 22px;
   color: var(--th-text-dark);
+  border: 7px solid var(--th-border-dark);
+  border-radius: var(--th-radius-sm);
 }
 
 .th-detail-title-row {

@@ -38,7 +38,7 @@
         
         {% if texture.texture_tags %}
         <label class="th-label">Tags</label>
-        <div class="container">
+        <div class="th-input">
             {% for tag in texture.texture_tags.split(',') %}
             <span class="th-detail-tag" style="display: inline-block; margin: 4px 6px 0 0;">{{ tag.strip() }}</span>
             {% endfor %}
@@ -52,6 +52,8 @@
                 Download <i class="fas fa-download"></i>
             </button>
         </form>
+        Views: {{views}}
+        Downloads: {{downloads}}
     </div>
     </div>
 
