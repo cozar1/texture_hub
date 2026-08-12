@@ -75,9 +75,9 @@ class Collection(db.Model):
 
 class Texture_Collection(db.Model):
     __tablename__ = 'Texture_Collection'
-    texture_collection_id = db.Column(db.Integer, primary_key= True)
-    texture_id = db.Column(db.Integer, foreign_key= True)
-    collection_id = db.Column(db.Integer, foreign_key= True)
+    texture_collection_id = db.Column(db.Integer, primary_key=True)
+    texture_id = db.Column(db.Integer, db.ForeignKey('Texture.texture_id'))
+    collection_id = db.Column(db.Integer, db.ForeignKey('Collection.collection_id'))
 
 
 # --- Routes ---
@@ -208,12 +208,8 @@ def texture(texture_id):
         collection_id = request.form.get("collection")
 
         if action == "add":
-            tc = Texture_Collection(
-                texture_id=texture_id,
-                collection_id=collection_id
-            )
+            tc = Texture_Collection(texture_id=texture_id, collection_id=collection_id)
             db.session.add(tc)
-
         elif action == "remove":
             Texture_Collection.query.filter_by(
                 texture_id=texture_id,
@@ -222,13 +218,29 @@ def texture(texture_id):
 
         db.session.commit()
 
-
-
     texture = Texture.query.filter_by(texture_id=texture_id).first()
     uploaded_user = User.query.filter_by(user_id=texture.texture_user_id).first()
-    
-    return render_template('texture.html', user=get_current_user(), texture=texture, uploaded_user=uploaded_user, collections=collections)
 
+    # collection_ids that already contain this texture
+    in_collections = {
+        row.collection_id
+        for row in Texture_Collection.query.filter_by(texture_id=texture_id).all()
+    }
+
+    # keyed by collection_id (ints), not str(c) — much easier to use in JS
+    collections_contained = {
+        c.collection_id: (c.collection_id in in_collections)
+        for c in collections
+    }
+
+    return render_template(
+        'texture.html',
+        user=user,
+        texture=texture,
+        uploaded_user=uploaded_user,
+        collections=collections,
+        collections_contained=collections_contained
+    )
 
 @app.route('/signup', methods=["POST", "GET"])
 def signup():

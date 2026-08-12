@@ -410,7 +410,9 @@ body.th-body::before {
   font-weight: 800;
   cursor: pointer;
   transition-duration: 0.2s;
-  width: 100%;
+  width: fit-content;
+  min-width: 3rem;
+  min-height: 3rem;
 }
 
 .th-submit-button{

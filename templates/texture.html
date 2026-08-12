@@ -16,11 +16,11 @@
                 </select>
                 <i class="fas fa-chevron-down"></i>
             </div>
-        <button type="submit" name="action" value="add" class="th-btn">
+        <button type="submit" name="action" value="add" class="th-btn" id="add-btn">
             <i class="fas fa-plus"></i>
         </button>
 
-        <button type="submit" name="action" value="remove" class="th-btn">
+        <button type="submit" name="action" value="remove" class="th-btn" id="remove-btn">
             <i class="fas fa-minus"></i>
         </button>
 
@@ -57,4 +57,23 @@
 
 
 </div>
+
+<script>
+    const collectionsContained = {{ collections_contained | tojson }};
+
+    const select = document.getElementById('collection-select');
+    const addBtn = document.getElementById('add-btn');
+    const removeBtn = document.getElementById('remove-btn');
+
+    function updateButtons() {
+        const selectedId = select.value;
+        const isInCollection = !!collectionsContained[selectedId];
+
+        addBtn.style.display = isInCollection ? 'none' : 'inline-flex';
+        removeBtn.style.display = isInCollection ? 'inline-flex' : 'none';
+    }
+
+    select.addEventListener('change', updateButtons);
+    document.addEventListener('DOMContentLoaded', updateButtons);
+</script>
 {% endblock %}
