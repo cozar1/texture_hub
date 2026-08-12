@@ -7,34 +7,42 @@
             <h1 class="th-detail-title">{{ profile_user.user_name }}</h1>
             <div class="th-detail-author">{{ textures|length }} textures · {{ collections|length }} collections</div>
         </div>
-        {% if owner %}
-        {% endif %}
-    </div>
         <a href="/logout" class="th-user-option" type="submit">Logout</a>
+    </div>
+        
 
     <div class="th-textures-header" style="margin-top: 24px;">
         <h1>Textures</h1>
         <a class="th-user-option" href="/upload">Upload</a>
+        <a class="th-user-option" href="/0?user={{ profile_user.user_name | urlencode }}">Show all textures</a>
     </div>
     <div class="container">
-    <div class="th-texture-grid" style="margin-top: 24px;">
-        {% for item in textures[:5] %}
-        {% include "texture_template.html" %}
-        {% endfor %}
+         {% if textures|length > 0 %}
+         <div class="th-texture-grid" style="margin-top: 24px;">
+            {% for item in textures[:5] %}
+            {% include "texture_template.html" %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No Textures, Try Creating One!</p>
+        {% endif%}
     </div>
-    </div>
-    <a class="th-user-option" href="/0?user={{ profile_user.user_name | urlencode }}">Show all textures</a>
+    
 
     <div class="th-textures-header" style="margin-top: 24px;">
         <h1>Collections</h1>
         <a class="th-user-option" href="/create_collection">Create collection</a>
     </div>
     <div class="container">
-    <div class="th-texture-grid">
-        {% for item in collections[:5] %}
-        {% include "collection_template.html" %}
-        {% endfor %}
-    </div>
+        {% if collections|length > 0 %}
+        <div class="th-texture-grid">
+            {% for item in collections[:5] %}
+            {% include "collection_template.html" %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="width:fit-content">No Collections, Try Creating One!</p>
+        {% endif%}
     </div>
 </div>
 {% endblock %}

@@ -30,10 +30,11 @@
 
     <div class="container">
         <div class="th-detail-title-row">
-            <h1 class="th-detail-title">{{ texture.texture_name }}</h1>
-            
+            <h1 class="th-detail-title">{{ texture.texture_name }}</h1>            
         </div>
         <div class="th-detail-author">Uploaded by <a class="th-signup-link" href="/user/{{ uploaded_user.user_name }}">{{ uploaded_user.user_name }}</a></div>
+        <div class="th-detail-author"><i class="fa-solid fa-eye"></i> <label style="margin-right: 20px;">{{views}}</label><i class="fa-solid fa-download"></i> {{downloads}}</div>
+        <br>
 
         
         {% if texture.texture_tags %}
@@ -52,8 +53,6 @@
                 Download <i class="fas fa-download"></i>
             </button>
         </form>
-        Views: {{views}}
-        Downloads: {{downloads}}
     </div>
     </div>
 

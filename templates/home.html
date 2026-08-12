@@ -7,10 +7,10 @@
             <div class="container">
                 <div class="th-filter-group">
                     <select class="th-input th-select" id="sort" name="sort">
-                        <option value="newest">Newest</option>
-                        <option value="oldest">Oldest</option>
-                        <option value="name_asc">Name A-Z</option>
-                        <option value="name_desc">Name Z-A</option>
+                        <option value="views">Most Views</option>
+                        <option value="downloads">Most Downloads</option>
+                        <option value="acending">Acending</option>
+                        <option value="decending">Decending</option>
                     </select>
                 </div>
             </div>
@@ -48,7 +48,7 @@
                         {% endif %}
                     {% endfor %}
                     {% if not items %}
-                        <div class="th-detail-panel" style="grid-column: 1 / -1;">
+                        <div style="grid-column: 1 / -1;">
                             <div class="th-detail-title">No items match your filters.</div>
                             <p class="th-detail-author">Try clearing the filters or searching for a shorter term.</p>
                         </div>
@@ -59,4 +59,5 @@
     
     </section>
 </div>
+
 {% endblock %}

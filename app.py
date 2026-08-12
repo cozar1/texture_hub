@@ -141,8 +141,10 @@ def home(page=0):
     tag_query = ''
     user_query = ''
     filtered_items = page_items
+    sort = "views"
 
     if request.method == 'POST':
+        sort = request.form.get('sort','')
         search_query = request.form.get('search', '').strip()
         tag_query = request.form.get('tags', '').strip()
         user_query = request.form.get('user', '').strip()
@@ -150,6 +152,8 @@ def home(page=0):
         search_query = request.args.get('search', '').strip()
         tag_query = request.args.get('tags', '').strip()
         user_query = request.args.get('user', '').strip()
+
+
 
     if search_query and len(search_query) < 20:
         lower_search = search_query.lower()
@@ -196,6 +200,31 @@ def home(page=0):
         if item in matched_by_name and item in matched_by_tags and item in matched_by_user
     ]
 
+
+    if sort == 'downloads':
+            filtered_items = sorted(
+                filtered_items,
+                key=lambda item: getattr(item, 'downloads', 0) or 0,
+                reverse=True
+            )
+    elif sort in ('ascending', 'acending'):
+        filtered_items = sorted(
+            filtered_items,
+            key=lambda item: (getattr(item, name_field, '') or '').lower()
+        )
+    elif sort in ('descending', 'decending'):
+        filtered_items = sorted(
+            filtered_items,
+            key=lambda item: (getattr(item, name_field, '') or '').lower(),
+            reverse=True
+        )
+    else:  # default / 'views'
+        filtered_items = sorted(
+            filtered_items,
+            key=lambda item: getattr(item, 'views', 0) or 0,
+            reverse=True
+        )
+
     return render_template(
         'home.html',
         user=get_current_user(),
@@ -218,14 +247,19 @@ def texture(texture_id):
         action = request.form.get("action")
         collection_id = request.form.get("collection")
 
-        if action == "add":
-            tc = Texture_Collection(texture_id=texture_id, collection_id=collection_id)
-            db.session.add(tc)
-        elif action == "remove":
-            Texture_Collection.query.filter_by(
-                texture_id=texture_id,
-                collection_id=collection_id
-            ).delete()
+        if collection_id:
+            if action == "add":
+                    tc = Texture_Collection(texture_id=texture_id, collection_id=collection_id)
+                    db.session.add(tc)   
+
+            elif action == "remove":
+                Texture_Collection.query.filter_by(
+                    texture_id=texture_id,
+                    collection_id=collection_id
+                ).delete()                    
+        else:
+            return redirect('/create_collection')
+
 
         db.session.commit()
 
@@ -449,7 +483,6 @@ def download_image(texture_id):
         return "File not found", 404
 
     current_user = get_current_user()
-    print(current_user.user_id)
 
     already_downloaded = Texture_Downloads.query.filter_by(
         texture_id=texture_id,
