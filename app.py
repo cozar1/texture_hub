@@ -203,12 +203,26 @@ def texture(texture_id):
 
     collections = Collection.query.filter_by(collection_user_id=user.user_id).all()
 
-    if request.method == 'POST':
-        if 'collection' in request.form:
-            collection_id = request.form.get('collection')
-            tc = Texture_Collection(texture_id=texture_id, collection_id=collection_id)
+    if request.method == "POST":
+        action = request.form.get("action")
+        collection_id = request.form.get("collection")
+
+        if action == "add":
+            tc = Texture_Collection(
+                texture_id=texture_id,
+                collection_id=collection_id
+            )
             db.session.add(tc)
-            db.session.commit()
+
+        elif action == "remove":
+            Texture_Collection.query.filter_by(
+                texture_id=texture_id,
+                collection_id=collection_id
+            ).delete()
+
+        db.session.commit()
+
+
 
     texture = Texture.query.filter_by(texture_id=texture_id).first()
     uploaded_user = User.query.filter_by(user_id=texture.texture_user_id).first()
