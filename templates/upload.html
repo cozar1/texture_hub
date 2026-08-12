@@ -6,11 +6,12 @@
     <div class="th-upload">      
         <div class="th-detail-image">
             <label class="th-upload-dropzone" id="upload-zone" for="file-input">
-                <span id="upload-placeholder">Upload</span>
-                <img id="upload-preview" class="upload-preview hidden" alt="Preview">
+
+                <img id="upload-preview" class="upload-preview hidden" alt="Click to Upload">
                 <input type="file" id="file-input" name="image" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
             </label>
         </div>
+        <div>
         <div class="container">
             <label class="th-label" for="display-name">Display Name</label>
             <input class="th-input" type="text" id="display-name" name="display_name" autocomplete="off" required maxlength="80"
@@ -18,10 +19,13 @@
             <label class="th-label" for="tags">Tags</label>
             <input class="th-input" type="text" id="tags" name="tags" autocomplete="off"
                     value="{{ request.form.get('tags', '') }}">
-        </div>
-
+        
+                </div>
+                <button class="th-upload-btn" type="submit">Upload</button>
+                </div>
+        
     </div>
-        <button class="th-upload-btn" type="submit">Upload</button>
+        
 </form>
 
 <script>
@@ -29,20 +33,17 @@
     var zone = document.getElementById('upload-zone');
     var input = document.getElementById('file-input');
     var preview = document.getElementById('upload-preview');
-    var placeholder = document.getElementById('upload-placeholder');
 
     function showPreview(file) {
         if (!file || !file.type || file.type.indexOf('image/') !== 0) return;
         preview.src = URL.createObjectURL(file);
         preview.classList.remove('hidden');
-        placeholder.style.display = 'none';
     }
 
     function resetPreview() {
         if (preview.src && preview.src.indexOf('blob:') === 0) URL.revokeObjectURL(preview.src);
         preview.removeAttribute('src');
         preview.classList.add('hidden');
-        placeholder.style.display = '';
     }
 
     input.addEventListener('change', function () {
