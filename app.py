@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, redirect, send_file, session,
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import HTTPException
 from werkzeug.utils import secure_filename
-from sqlalchemy import func
+from sqlalchemy import func, delete
 
 app = Flask(__name__)
 app.secret_key = 'replace-this-with-a-secure-secret'
@@ -464,7 +464,30 @@ def collection(_collection_id):
     texture_ids = Texture_Collection.query.filter_by(collection_id = collection.collection_id).all()
     textures = [Texture.query.filter_by(texture_id = tc.texture_id).one() for tc in texture_ids]
 
-    return render_template('collection.html', user=user, collection=collection, collection_user=collection_user, textures=textures)
+    return render_template(
+        'collection.html', 
+        user=user, 
+        collection=collection, 
+        collection_user=collection_user, 
+        textures=textures)
+
+@app.route('/delete_texture/<int:texture_id>', methods=['GET', 'POST'])
+def delete_texture(texture_id):
+    db.session.execute(delete(Texture_Views).where(Texture_Views.texture_id == texture_id))
+    db.session.execute(delete(Texture_Downloads).where(Texture_Downloads.texture_id == texture_id))
+    db.session.execute(delete(Texture_Collection).where(Texture_Collection.texture_id == texture_id))
+    db.session.execute(delete(Texture).where(Texture.texture_id == texture_id))
+    db.session.commit()
+
+    return redirect("/")
+
+@app.route('/delete_collection/<int:collection_id>', methods=['GET', 'POST'])
+def delete_collection(collection_id):
+    db.session.execute(delete(Collection).where(Collection.texture_id == collection_id))
+    db.session.execute(delete(Texture_Collection).where(Texture_Collection.texture_id == collection_id))
+    db.session.commit()
+
+    return redirect("/")
 
 @app.route('/download/<int:texture_id>', methods=['GET', 'POST'])
 def download_image(texture_id):

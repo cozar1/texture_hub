@@ -383,6 +383,7 @@ body.th-body::before {
   padding-right: 32px;
 }
 
+
 .th-input::placeholder,
 .th-textarea::placeholder { color: var(--th-text-dark); opacity: 0.55; }
 
@@ -781,6 +782,15 @@ body.th-body::before {
   grid-template-columns: 1fr 1fr;
   gap: 28px;
   align-items: start;
+}
+
+.delete {
+  all: unset;
+  font-size: var(--th-font-size-text);
+  color: #da403a;
+  text-shadow: 0px 3px 0px rgba(0, 0, 0, 0.329);
+  cursor: pointer;
+  
 }
 
 .th-upload-dropzone {

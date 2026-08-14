@@ -34,7 +34,6 @@
         </div>
         <div class="th-detail-author">Uploaded by <a class="th-signup-link" href="/user/{{ uploaded_user.user_name }}">{{ uploaded_user.user_name }}</a></div>
         <div class="th-detail-author"><i class="fa-solid fa-eye"></i> <label style="margin-right: 20px;">{{views}}</label><i class="fa-solid fa-download"></i> {{downloads}}</div>
-        <br>
 
         
         {% if texture.texture_tags %}
@@ -45,15 +44,18 @@
             {% endfor %}
         </div>
         {% endif %}
-
-            <div class="th-download-panel">
-        <div class="th-label"> </div>
+        <div class="th-download-panel">
+        <label style="margin-bottom: -10px;" class="th-label">Download</label>
         <form action="/download/{{ texture.texture_id }}" method="post">
             <button class="th-btn th-download-btn" type="submit" name="download" value="download">
                 Download <i class="fas fa-download"></i>
             </button>
         </form>
     </div>
+    {% if uploaded_user == user %}
+    <label style="margin-bottom: -10px;" class="th-label">Manage</label>
+    <a href="/delete_texture/{{texture.texture_id}}" class="delete"><i class="fa-solid fa-trash-can"></i> Delete</a>
+    {% endif %}
     </div>
 
 
