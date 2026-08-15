@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 from sqlalchemy import func, delete
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
+from werkzeug.security import generate_password_hash, check_password_hash
 
 ## ========== Config ==========
 app = Flask(__name__)
@@ -394,7 +395,8 @@ def signup():
                     error = "There is Already an Account with this Username"
                 else:
                     # Creates the user in the database
-                    new_user = User(user_name=username, user_password=password, user_rating=0)
+                    hashed_password = generate_password_hash(password)
+                    new_user = User(user_name=username, user_password=hashed_password, user_rating=0)
                     db.session.add(new_user)
                     db.session.commit()
                     session['user_id'] = new_user.user_id
@@ -423,12 +425,17 @@ def login():
             else:
                 # uername or password incorrect warning
                 _user = User.query.filter_by(user_name=username).first()
-                if _user and password == _user.user_password:
-                    # Sets the current session users
-                    session['user_id'] = _user.user_id
-                    return redirect("/")
-                else:
-                    error = "Username or Password is Incorrect"
+                if _user:
+                    if check_password_hash(_user.user_password, password):
+                        session['user_id'] = _user.user_id
+                        return redirect("/")
+                    elif password == _user.user_password:  # legacy plaintext fallback
+                        _user.user_password = generate_password_hash(password)
+                        db.session.commit()
+                        session['user_id'] = _user.user_id
+                        return redirect("/")
+                    else:
+                        error = "Username or Password is Incorrect"
         else:
             error = "Please enter a Username & Password"
 
