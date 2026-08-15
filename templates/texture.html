@@ -8,6 +8,7 @@
             <label class="th-label" for="collection-select">Add to Collection</label>
         </div>
         <form action="/texture/{{ texture.texture_id }}" method="post" style="display:flex; gap:10px; align-items:center;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="th-select-wrap" style="flex:1;">
                 <select class="th-input th-select" name="collection" id="collection-select">
                     {% for item in collections %}
@@ -47,6 +48,7 @@
         <div class="th-download-panel">
         <label style="margin-bottom: -10px;" class="th-label">Download</label>
         <form action="/download/{{ texture.texture_id }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <button class="th-btn th-download-btn" type="submit" name="download" value="download">
                 Download <i class="fas fa-download"></i>
             </button>

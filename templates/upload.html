@@ -2,6 +2,7 @@
 {% block title %}Upload Texture — Texture Hub{% endblock %}
 {% block content %}
 <form class="th-upload-form" action="/upload" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <h1 class="th-upload-title">Upload</h1>
     <div class="th-upload">      
         <div class="th-detail-image">

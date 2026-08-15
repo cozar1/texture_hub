@@ -12,6 +12,8 @@
 
         <div class="th-login-box">
             <form class="th-upload-form" action="/create_collection" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
                 <label class="th-label" for="display-name">Display Name</label>
                 <input class="th-input" type="text" id="display-name" name="display_name" autocomplete="off" required maxlength="80"
                        value="{{ request.form.get('display_name', '') }}">

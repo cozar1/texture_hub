@@ -6,6 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import HTTPException
 from werkzeug.utils import secure_filename
 from sqlalchemy import func, delete
+from flask import Flask
+from flask_wtf.csrf import CSRFProtect
 
 ## ========== Config ==========
 app = Flask(__name__)
@@ -14,6 +16,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+csrf = CSRFProtect(app)
 
 ## ========== Directories ==========
 STATIC_IMAGES_DIR = os.path.join(app.root_path, 'static', 'images')
@@ -108,12 +111,7 @@ def internal_error(error):
 def handle_exception(error):
     if isinstance(error, HTTPException):
         return render_error(error.description, error.code)
-    return render_error('An unexpected error occurred.', 500)
-
-@app.route('/error')
-def error(_error=None):
-    message = _error if _error else 'An error occurred.'
-    return render_error(message)
+    return render_error(str(error), 500)
 
 # Rediracts to the default textures page 
 @app.route('/')
@@ -142,12 +140,6 @@ def home(page=0):
 
 
     ## Filtering
-    search_query = ''
-    tag_query = ''
-    user_query = ''
-    filtered_items = page_items
-    sort = "views"
-
     ## Gets selected filtering options
     if request.method == 'POST':
         # Pull filter/sort params from form body on POST
@@ -160,6 +152,7 @@ def home(page=0):
         search_query = request.args.get('search', '').strip()
         tag_query = request.args.get('tags', '').strip()
         user_query = request.args.get('user', '').strip()
+        sort = request.args.get('sort', '')
 
 
     # --- Filter by name (search box) ---
@@ -298,30 +291,31 @@ def texture(texture_id):
     # Fetches users collections to be used for the 'add to collection' drop-down
     collections = Collection.query.filter_by(collection_user_id=user.user_id).all()
 
-    # Handles adding and removing the texture from collection
-    if request.method == "POST":
-        action = request.form.get("action")
-        collection_id = request.form.get("collection")
-
-        if collection_id:
-            if action == "add":
-                    tc = Texture_Collection(texture_id=texture_id, collection_id=collection_id)
-                    db.session.add(tc)   
-
-            elif action == "remove":
-                Texture_Collection.query.filter_by(
-                    texture_id=texture_id,
-                    collection_id=collection_id
-                ).delete()                    
-        else:
-            # if the user has no collection, takes them to the create collection page
-            return redirect('/create_collection')
-
-        db.session.commit()
-
-
     texture = Texture.query.filter_by(texture_id=texture_id).first()
     uploaded_user = User.query.filter_by(user_id=texture.texture_user_id).first()
+
+    # Handles adding and removing the texture from collection
+    # - Makes sure only owned user can modify
+    if texture.texture_user_id == user.user_id:
+        if request.method == "POST":
+            action = request.form.get("action")
+            collection_id = request.form.get("collection")
+
+            if collection_id:
+                if action == "add":
+                        tc = Texture_Collection(texture_id=texture_id, collection_id=collection_id)
+                        db.session.add(tc)   
+
+                elif action == "remove":
+                    Texture_Collection.query.filter_by(
+                        texture_id=texture_id,
+                        collection_id=collection_id
+                    ).delete()                    
+            else:
+                # if the user has no collection, takes them to the create collection page
+                return redirect('/create_collection')
+
+            db.session.commit()
 
     # collection_ids that already contain this texture
     in_collections = {
@@ -364,6 +358,8 @@ def texture(texture_id):
 @app.route('/collection/<_collection_id>', methods=['GET', 'POST'])
 def collection(_collection_id):
     user = get_current_user()
+    if user is None:
+        return redirect('/login')
 
     collection = Collection.query.filter_by(collection_id = _collection_id).one() # gets singular collection
     collection_user = User.query.filter_by(user_id = collection.collection_user_id).one() # gets collection users
@@ -575,8 +571,8 @@ def delete_texture(texture_id):
 # - Deltes all instances of a collection through all relevant tables
 @app.route('/delete_collection/<int:collection_id>', methods=['GET', 'POST'])
 def delete_collection(collection_id):
-    db.session.execute(delete(Collection).where(Collection.texture_id == collection_id))
-    db.session.execute(delete(Texture_Collection).where(Texture_Collection.texture_id == collection_id))
+    db.session.execute(delete(Collection).where(Collection.collection_id == collection_id))
+    db.session.execute(delete(Texture_Collection).where(Texture_Collection.collection_id == collection_id))
     db.session.commit()
 
     return redirect("/")
@@ -586,9 +582,17 @@ def delete_collection(collection_id):
 # - Handles Texture Downloads Stat
 @app.route('/download/<int:texture_id>', methods=['GET', 'POST'])
 def download_image(texture_id):
+    user = get_current_user()
+    if user is None: # Makes sure user_id exists
+        return redirect('/login')
+
     texture = Texture.query.filter_by(texture_id=texture_id).first()
     if not texture: # Handles no texture error
         return "Texture not found", 404
+
+    # Makes sure valid user is deleting
+    if texture.texture_user_id != user.user_id:
+         return redirect('/')
 
     # Extract filename from the stored path
     if texture.texture_address.startswith('/static/images/'):
@@ -600,17 +604,17 @@ def download_image(texture_id):
     if not os.path.isfile(file_path):
         return "File not found", 404
 
-    current_user = get_current_user()
+
 
     # Texture Downloads Stat
     already_downloaded = Texture_Downloads.query.filter_by(
         texture_id=texture_id,
-        user_id=current_user.user_id
+        user_id=user.user_id
     ).first() is not None
 
 
     if not already_downloaded:
-        td = Texture_Downloads(texture_id=texture_id, user_id=current_user.user_id)
+        td = Texture_Downloads(texture_id=texture_id, user_id=user.user_id)
         db.session.add(td)
         db.session.commit() 
 

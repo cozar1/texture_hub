@@ -3,6 +3,7 @@
 <div class="th-textures-layout">
     <aside class="th-sidebar">
         <form action="/{{ page }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <label class="th-label" for="sort">Sort</label>
             <div class="container">
                 <div class="th-filter-group">
