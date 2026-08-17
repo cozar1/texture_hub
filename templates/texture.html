@@ -3,12 +3,15 @@
 {% block content %}
 <div class="th-texture-page">
     <div class="th-item-page-img-column">
-    <div class="th-detail-image" style="background-image: url('{{ texture.texture_address | texture_url }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
-    <div class="th-collection-row">
+        <div class="th-detail-image"
+            style="background-image: url('{{ texture.texture_address | texture_url }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        </div>
+        <div class="th-collection-row">
             <label class="th-label" for="collection-select">Add to Collection</label>
         </div>
-        <form action="/texture/{{ texture.texture_id }}" method="post" style="display:flex; gap:10px; align-items:center;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <form action="/texture/{{ texture.texture_id }}" method="post"
+            style="display:flex; gap:10px; align-items:center;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <div class="th-select-wrap" style="flex:1;">
                 <select class="th-input th-select" name="collection" id="collection-select">
                     {% for item in collections %}
@@ -17,13 +20,13 @@
                 </select>
                 <i class="fas fa-chevron-down"></i>
             </div>
-        <button type="submit" name="action" value="add" class="th-btn" id="add-btn">
-            <i class="fas fa-plus"></i>
-        </button>
+            <button type="submit" name="action" value="add" class="th-btn" id="add-btn">
+                <i class="fas fa-plus"></i>
+            </button>
 
-        <button type="submit" name="action" value="remove" class="th-btn" id="remove-btn">
-            <i class="fas fa-minus"></i>
-        </button>
+            <button type="submit" name="action" value="remove" class="th-btn" id="remove-btn">
+                <i class="fas fa-minus"></i>
+            </button>
 
         </form>
     </div>
@@ -31,12 +34,14 @@
 
     <div class="container">
         <div class="th-detail-title-row">
-            <h1 class="th-detail-title">{{ texture.texture_name }}</h1>            
+            <h1 class="th-detail-title">{{ texture.texture_name }}</h1>
         </div>
-        <div class="th-detail-author">Uploaded by <a class="th-signup-link" href="/user/{{ uploaded_user.user_name }}">{{ uploaded_user.user_name }}</a></div>
-        <div class="th-detail-author"><i class="fa-solid fa-eye"></i> <label style="margin-right: 20px;">{{views}}</label><i class="fa-solid fa-download"></i> {{downloads}}</div>
+        <div class="th-detail-author">Uploaded by <a class="th-signup-link"
+                href="/user/{{ uploaded_user.user_name }}">{{ uploaded_user.user_name }}</a></div>
+        <div class="th-detail-author"><i class="fa-solid fa-eye"></i> <label
+                style="margin-right: 20px;">{{views}}</label><i class="fa-solid fa-download"></i> {{downloads}}</div>
 
-        
+
         {% if texture.texture_tags %}
         <label class="th-label">Tags</label>
         <div class="th-input">
@@ -46,18 +51,18 @@
         </div>
         {% endif %}
         <div class="th-download-panel">
-        <label style="margin-bottom: -10px;" class="th-label">Download</label>
-        <form action="/download/{{ texture.texture_id }}" method="post">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <button class="th-btn th-download-btn" type="submit" name="download" value="download">
-                Download <i class="fas fa-download"></i>
-            </button>
-        </form>
-    </div>
-    {% if uploaded_user == user %}
-    <label style="margin-bottom: -10px;" class="th-label">Manage</label>
-    <a href="/delete_texture/{{texture.texture_id}}" class="delete"><i class="fa-solid fa-trash-can"></i> Delete</a>
-    {% endif %}
+            <label style="margin-bottom: -10px;" class="th-label">Download</label>
+            <form action="/download/{{ texture.texture_id }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button class="th-btn th-download-btn" type="submit" name="download" value="download">
+                    Download <i class="fas fa-download"></i>
+                </button>
+            </form>
+        </div>
+        {% if uploaded_user == user %}
+        <label style="margin-bottom: -10px;" class="th-label">Manage</label>
+        <a href="/delete_texture/{{texture.texture_id}}" class="delete"><i class="fa-solid fa-trash-can"></i> Delete</a>
+        {% endif %}
     </div>
 
 

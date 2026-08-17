@@ -9,7 +9,7 @@
         </div>
         <a href="/logout" class="th-user-option" type="submit">Logout</a>
     </div>
-        
+
 
     <div class="th-textures-header" style="margin-top: 24px;">
         <h1>Textures</h1>
@@ -17,8 +17,8 @@
         <a class="th-user-option" href="/0?user={{ profile_user.user_name | urlencode }}">Show all textures</a>
     </div>
     <div class="container">
-         {% if textures|length > 0 %}
-         <div class="th-texture-grid" style="margin-top: 24px;">
+        {% if textures|length > 0 %}
+        <div class="th-texture-grid" style="margin-top: 24px;">
             {% for item in textures[:5] %}
             {% include "texture_template.html" %}
             {% endfor %}
@@ -27,7 +27,7 @@
         <p>No Textures, Try Creating One!</p>
         {% endif%}
     </div>
-    
+
 
     <div class="th-textures-header" style="margin-top: 24px;">
         <h1>Collections</h1>

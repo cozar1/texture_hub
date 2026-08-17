@@ -2,84 +2,85 @@
 {% block title %}Upload Texture — Texture Hub{% endblock %}
 {% block content %}
 <form class="th-upload-form" action="/upload" method="post" enctype="multipart/form-data">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <h1 class="th-upload-title">Upload</h1>
-    <div class="th-upload">      
+    <div class="th-upload">
         <div class="th-detail-image">
             <label class="th-upload-dropzone" id="upload-zone" for="file-input">
 
                 <img id="upload-preview" class="upload-preview hidden" alt="Click to Upload">
-                <input type="file" id="file-input" name="image" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
+                <input type="file" id="file-input" name="image" accept="image/png,image/jpeg,image/gif,image/webp"
+                    hidden>
             </label>
         </div>
         <div>
-        <div class="container">
-            <label class="th-label" for="display-name">Display Name</label>
-            <input class="th-input" type="text" id="display-name" name="display_name" autocomplete="off" required maxlength="80"
-                    value="{{ request.form.get('display_name', '') }}">
-            <label class="th-label" for="tags">Tags</label>
-            <input class="th-input" type="text" id="tags" name="tags" autocomplete="off"
+            <div class="container">
+                <label class="th-label" for="display-name">Display Name</label>
+                <input class="th-input" type="text" id="display-name" name="display_name" autocomplete="off" required
+                    maxlength="80" value="{{ request.form.get('display_name', '') }}">
+                <label class="th-label" for="tags">Tags</label>
+                <input class="th-input" type="text" id="tags" name="tags" autocomplete="off"
                     value="{{ request.form.get('tags', '') }}">
-        
-                </div>
-                <button class="th-upload-btn" type="submit">Upload</button>
-                </div>
-        
+
+            </div>
+            <button class="th-upload-btn" type="submit">Upload</button>
+        </div>
+
     </div>
-        
+
 </form>
 
 <script>
-(function () {
-    var zone = document.getElementById('upload-zone');
-    var input = document.getElementById('file-input');
-    var preview = document.getElementById('upload-preview');
+    (function () {
+        var zone = document.getElementById('upload-zone');
+        var input = document.getElementById('file-input');
+        var preview = document.getElementById('upload-preview');
 
-    function showPreview(file) {
-        if (!file || !file.type || file.type.indexOf('image/') !== 0) return;
-        preview.src = URL.createObjectURL(file);
-        preview.classList.remove('hidden');
-    }
+        function showPreview(file) {
+            if (!file || !file.type || file.type.indexOf('image/') !== 0) return;
+            preview.src = URL.createObjectURL(file);
+            preview.classList.remove('hidden');
+        }
 
-    function resetPreview() {
-        if (preview.src && preview.src.indexOf('blob:') === 0) URL.revokeObjectURL(preview.src);
-        preview.removeAttribute('src');
-        preview.classList.add('hidden');
-    }
+        function resetPreview() {
+            if (preview.src && preview.src.indexOf('blob:') === 0) URL.revokeObjectURL(preview.src);
+            preview.removeAttribute('src');
+            preview.classList.add('hidden');
+        }
 
-    input.addEventListener('change', function () {
-        var f = input.files && input.files[0];
-        resetPreview();
-        if (f) showPreview(f);
-    });
-
-    ['dragenter', 'dragover'].forEach(function (evName) {
-        zone.addEventListener(evName, function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            zone.classList.add('upload-dropzone--drag');
+        input.addEventListener('change', function () {
+            var f = input.files && input.files[0];
+            resetPreview();
+            if (f) showPreview(f);
         });
-    });
 
-    ['dragleave', 'drop'].forEach(function (evName) {
-        zone.addEventListener(evName, function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            zone.classList.remove('upload-dropzone--drag');
+        ['dragenter', 'dragover'].forEach(function (evName) {
+            zone.addEventListener(evName, function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.add('upload-dropzone--drag');
+            });
         });
-    });
 
-    zone.addEventListener('drop', function (e) {
-        var dt = e.dataTransfer;
-        if (!dt || !dt.files || !dt.files.length) return;
-        var f = dt.files[0];
-        if (!f.type || f.type.indexOf('image/') !== 0) return;
-        var buf = new DataTransfer();
-        buf.items.add(f);
-        input.files = buf.files;
-        resetPreview();
-        showPreview(f);
-    });
-})();
+        ['dragleave', 'drop'].forEach(function (evName) {
+            zone.addEventListener(evName, function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.remove('upload-dropzone--drag');
+            });
+        });
+
+        zone.addEventListener('drop', function (e) {
+            var dt = e.dataTransfer;
+            if (!dt || !dt.files || !dt.files.length) return;
+            var f = dt.files[0];
+            if (!f.type || f.type.indexOf('image/') !== 0) return;
+            var buf = new DataTransfer();
+            buf.items.add(f);
+            input.files = buf.files;
+            resetPreview();
+            showPreview(f);
+        });
+    })();
 </script>
 {% endblock %}

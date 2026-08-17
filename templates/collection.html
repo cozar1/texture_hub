@@ -4,21 +4,23 @@
 <div class="th-detail-panel">
     <div class="th-detail-title-row">
         <h1 class="th-detail-title">{{ collection.collection_name }}</h1>
-        <div class="th-detail-author">Uploaded by <a class="th-signup-link" href="/user/{{ collection_user.user_name }}">{{ collection_user.user_name }}</a></div>
+        <div class="th-detail-author">Uploaded by <a class="th-signup-link"
+                href="/user/{{ collection_user.user_name }}">{{ collection_user.user_name }}</a></div>
     </div>
     <div class="th-collection-row">
         <span class="th-stat-label">Collection</span>
         <div class="th-stat-track"></div>
         <span class="th-stat-value">{{ textures|length }} textures</span>
     </div>
-        {% if collection_user == user %}
-        <a href="/delete_collection/{{collection.collection_id}}" class="delete"><i class="fa-solid fa-trash-can"></i> Delete</a>
-        {% endif %}
+    {% if collection_user == user %}
+    <a href="/delete_collection/{{collection.collection_id}}" class="delete"><i class="fa-solid fa-trash-can"></i>
+        Delete</a>
+    {% endif %}
 </div>
 
 <div class="th-texture-grid" style="margin-top: 24px;">
     {% for item in textures %}
-        {% include "texture_template.html" %}
+    {% include "texture_template.html" %}
     {% endfor %}
 </div>
 {% endblock %}

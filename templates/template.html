@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="/static/style.css">
     <title>{% block title %}Texture Hub{% endblock %}</title>
 </head>
+
 <body class="th-body">
     {% if request.endpoint not in ('login', 'signup') %}
     <header class="th-navbar">
@@ -15,16 +17,18 @@
         <div class="container">
             <ul class="th-nav-links">
                 <li><a href="/0" class="th-nav-link {% if request.path == '/' %}is-active{% endif %}">TEXTURES</a></li>
-                <li><a href="/1" class="th-nav-link {% if request.path == '/collections' %}is-active{% endif %}">COLLECTIONS</a></li>
+                <li><a href="/1"
+                        class="th-nav-link {% if request.path == '/collections' %}is-active{% endif %}">COLLECTIONS</a>
+                </li>
             </ul>
         </div>
 
         <div class="container">
             <ul class="th-nav-links">
                 {% if user %}
-                    <li><a class="th-nav-link" href="/user/{{ user.user_name }}">{{ user.user_name }}</a></li>
-                {% else %}         
-                    <li><a href="/login" class="th-nav-link {% if request.path == '/' %}is-active{% endif %}">Login</a></li>
+                <li><a class="th-nav-link" href="/user/{{ user.user_name }}">{{ user.user_name }}</a></li>
+                {% else %}
+                <li><a href="/login" class="th-nav-link {% if request.path == '/' %}is-active{% endif %}">Login</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -35,4 +39,5 @@
         {% endblock %}
     </main>
 </body>
+
 </html>
