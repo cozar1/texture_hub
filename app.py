@@ -15,6 +15,7 @@ app = Flask(__name__)
 app.secret_key = "replace-this-with-a-secure-secret"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 
 
 db = SQLAlchemy(app)
 csrf = CSRFProtect(app)
@@ -103,7 +104,33 @@ class Texture_Downloads(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("User.user_id"))
 
 
-# ========== Routes ==========
+# ========== Error Handling ==========
+# Renders the error to the error page
+def render_error(message, status_code=400):
+    return render_template("error.html", error=message), status_code
+
+# Handles all errors types (404, 500..etc)
+@app.errorhandler(Exception)
+def handle_exception(error):
+    if isinstance(error, HTTPException):
+        code = error.code
+        if code == 404:
+            message = "That page doesn't exist."
+        elif code == 401:
+            message = "Please log in to continue."
+        elif code == 403:
+            message = "You don't have permission to do that."
+        elif code == 413:
+            message = "That file is too large to upload."
+        else:
+            message = error.description
+        return render_error(message, code)
+
+    app.logger.exception(error)
+    return render_error("An internal server error occurred.", 500)
+
+
+# ========== Helper FUnctions ==========
 # Decroator to automatically check login instead of doing it
 # nativly on every page
 def login_required(view):
@@ -117,7 +144,8 @@ def login_required(view):
     return wrapped
 
 
-# useful function for getting the obj when it can be null
+# Helper function to get an obj or return a 404
+# useful if an obj needs to exist
 def get_or_404(model, **filters):
     obj = model.query.filter_by(**filters).first()
     if obj is None:
@@ -125,16 +153,21 @@ def get_or_404(model, **filters):
     return obj
 
 
+# Helper function returns returns if an obj exists
+def exists(model, **filters):
+    return model.query.filter_by(**filters).first() is not None
+
+
+# Helper function returns the obj or none
+def get_or_none(model, **filters):
+    return model.query.filter_by(**filters).first()
+
+
 # cascadingly deletes an items from all its instances in the database
 def cascade_delete(mapping):
     for model, column, value in mapping:
         db.session.execute(delete(model).where(column == value))
     db.session.commit()
-
-
-# Error Execeptions
-def render_error(message, status_code=400):
-    return render_template("error.html", error=message), status_code
 
 
 # Checks if an item exists then adds it to the database
@@ -145,23 +178,7 @@ def record_once(model, **filters):
         db.session.commit()
 
 
-@app.errorhandler(404)
-def not_found_error(error):
-    return render_error("Page not found.", 404)
-
-
-@app.errorhandler(500)
-def internal_error(error):
-    return render_error("An internal server error occurred.", 500)
-
-
-@app.errorhandler(Exception)
-def handle_exception(error):
-    if isinstance(error, HTTPException):
-        return render_error(error.description, error.code)
-    return render_error(str(error), 500)
-
-
+# ========== Routes ==========
 # Rediracts to the default textures page
 @app.route("/")
 def route():
@@ -220,16 +237,16 @@ def home(page=0):
     # Look up the User by name, then keep only items whose owner field
     # (texture_user_id / collection_user_id) matches that user's id.
     if user_query and owner_field and len(user_query) < 20:
-        owner = get_or_404(User, user_name=user_query)
-        if owner:
-            matched_by_user = [
+        owner = get_or_none(User, user_name=user_query)
+        matched_by_user = (
+            [
                 item
                 for item in page_items
                 if getattr(item, owner_field, None) == owner.user_id
             ]
-        else:
-            # No such user -> no matches
-            matched_by_user = []
+            if owner
+            else []
+        )
     else:
         matched_by_user = page_items
 
@@ -374,10 +391,7 @@ def texture(user, texture_id):
     }
 
     # Handles users only accounting for 1 view per texture
-    already_viewed = (
-        get_or_404(Texture_Views, texture_id=texture_id, user_id=user.user_id)
-        is not None
-    )
+    already_viewed = exists(Texture_Views, texture_id=texture_id, user_id=user.user_id)
 
     if not already_viewed:
         record_once(Texture_Views, texture_id=texture_id, user_id=user.user_id)
@@ -443,9 +457,7 @@ def signup():
             ):  # username and password max & min lengths
                 error = "Username or Password is Too Long"
             else:
-                if get_or_404(
-                    User, user_name=username
-                ):  # only allowing unique usernames
+                if exists(User, user_name=username):
                     error = "There is Already an Account with this Username"
                 else:
                     # Creates the user in the database
@@ -483,18 +495,18 @@ def login():
                 error = "Username or Password is Too Long"
             else:
                 # uername or password incorrect warning
-                _user = get_or_404(User, user_name=username)
-                if _user:
-                    if check_password_hash(_user.user_password, password):
-                        session["user_id"] = _user.user_id
-                        return redirect("/")
-                    elif password == _user.user_password:  # legacy plaintext fallback
-                        _user.user_password = generate_password_hash(password)
-                        db.session.commit()
-                        session["user_id"] = _user.user_id
-                        return redirect("/")
-                    else:
-                        error = "Username or Password is Incorrect"
+                _user = get_or_none(User, user_name=username)
+                if _user and check_password_hash(_user.user_password, password):
+                    session["user_id"] = _user.user_id
+                    return redirect("/")
+                elif password == _user.user_password:  # legacy plaintext fallback
+                    _user.user_password = generate_password_hash(password)
+                    db.session.commit()
+                    session["user_id"] = _user.user_id
+                    return redirect("/")
+                else:
+                    error = "Username or Password is Incorrect"
+
         else:
             error = "Please enter a Username & Password"
 
@@ -564,7 +576,7 @@ def upload(user):
             error = "Please enter a display name."
         elif not file or file.filename == "":  # Must be an image file
             error = "Please choose an image file."
-        elif get_or_404(Texture, texture_name=display_name):  # Must have unique name
+        elif exists(Texture, texture_name=display_name):  # Must have unique name
             error = "That display name is already taken."
         else:
             original = secure_filename(file.filename)
@@ -653,14 +665,12 @@ def delete_collection(collection_id):
 # - Handles Texture Downloads Stat
 @app.route("/download/<int:texture_id>", methods=["GET", "POST"])
 @login_required
-def download_image(texture_id, user):
+def download_image(user, texture_id):
     texture = get_or_404(Texture, texture_id=texture_id)
     if not texture:  # Handles no texture error
         return "Texture not found", 404
 
-    # Makes sure valid user is deleting
-    if texture.texture_user_id != user.user_id:
-        return redirect("/")
+
 
     # Extract filename from the stored path
     if texture.texture_address.startswith("/static/images/"):
@@ -673,16 +683,19 @@ def download_image(texture_id, user):
         return "File not found", 404
 
     # Texture Downloads Stat
-    already_downloaded = (
-        get_or_404(Texture_Downloads, texture_id=texture_id, user_id=user.user_id)
-        is not None
+    already_downloaded = exists(
+        Texture_Downloads, texture_id=texture_id, user_id=user.user_id
     )
 
     if not already_downloaded:
         record_once(Texture_Downloads, texture_id=texture_id, user_id=user.user_id)
 
+    # Preserve the real file extension so the downloaded file has the correct type
+    ext = os.path.splitext(filename)[1]  # e.g. ".png", ".jpg"
+    download_name = secure_filename(texture.texture_name) + ext
+
     # Sends file to users device
-    return send_file(file_path, as_attachment=True, download_name=texture.texture_name)
+    return send_file(file_path, as_attachment=True, download_name=download_name)
 
 
 if __name__ == "__main__":

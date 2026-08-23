@@ -1,6 +1,11 @@
 {% extends "template.html" %}
 {% block title %}Upload Texture — Texture Hub{% endblock %}
 {% block content %}
+{% if error%}
+<div class="error">
+    <p style="text-align: center; margin-top: 2rem;">{{error}}</p>
+</div>
+{% endif%}
 <form class="th-upload-form" action="/upload" method="post" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <h1 class="th-upload-title">Upload</h1>

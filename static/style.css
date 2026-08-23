@@ -556,6 +556,18 @@ body.th-body::before {
   padding: 8px 10px;
 }
 
+.error-page{
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.scary-cat{
+  width: 40vw;
+}
+
 .th-textures-main {
   min-width: 0;
 }

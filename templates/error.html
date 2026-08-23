@@ -3,7 +3,11 @@
 
 <!-- Main Layout -->
 <div class="main">
-    {{error}}
+    <div class="error-page">
+        <img class="scary-cat" src="{{ url_for('static', filename='images/scary-cat.png') }}" alt="Spoooky larry">
+        <h1>{{error}}</h1>
+    </div>
+    
 </div>
 
 {% endblock %}
