@@ -387,13 +387,20 @@ def home(page=0):
     )
 
 
-def _update_texture_collections(texture_id):
+def _update_texture_collections(texture_id, user):
     """Handle the add/remove-from-collection form on the texture page."""
     action = request.form.get("action")
     collection_id = request.form.get("collection")
 
     if not collection_id:
         return redirect("/create_collection")
+
+    # Only allow modifying a collection the current user actually owns.
+    owns_collection = record_exists(
+        Collection, collection_id=collection_id, collection_user_id=user.user_id
+    )
+    if not owns_collection:
+        abort(403)
 
     if action == "add":
         db.session.add(
@@ -417,9 +424,8 @@ def texture_detail(user, texture_id):
     texture_obj = get_or_404(Texture, texture_id=texture_id)
     uploaded_user = get_or_404(User, user_id=texture_obj.texture_user_id)
 
-    is_owner = texture_obj.texture_user_id == user.user_id
-    if is_owner and request.method == "POST":
-        redirect_response = _update_texture_collections(texture_id)
+    if request.method == "POST":
+        redirect_response = _update_texture_collections(texture_id, user)
         if redirect_response is not None:
             return redirect_response
 
