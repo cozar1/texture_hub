@@ -1,8 +1,22 @@
+"""Flask application for uploading, browsing and collecting textures.
+
+Provides user accounts, texture uploads, collections of textures, and
+simple view/download tracking.
+"""
+
 import os
 import uuid
 from functools import wraps
 
-from flask import Flask, abort, redirect, render_template, request, send_file, session
+from flask import (
+    Flask,
+    abort,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    session,
+)
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import delete, func
@@ -15,7 +29,7 @@ app = Flask(__name__)
 app.secret_key = "replace-this-with-a-secure-secret"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
 db = SQLAlchemy(app)
 csrf = CSRFProtect(app)
@@ -25,25 +39,35 @@ STATIC_IMAGES_DIR = os.path.join(app.root_path, "static", "images")
 DEFAULT_TEXTURE_URL = "/static/images/texture.png"
 ALLOWED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg"}
 
+# Character limits shared by the signup/login/upload/collection forms.
+NAME_MIN_LENGTH = 5
+NAME_MAX_LENGTH = 20
+CREDENTIAL_MAX_LENGTH = 20
+TAGS_MAX_LENGTH = 100
 
-# Gets the current user logged in to the session
+
 def get_current_user():
+    """Return the ``User`` tied to the current session, or ``None``."""
     user_id = session.get("user_id")
     if user_id is None:
         return None
     return User.query.get(user_id)
 
 
-# Serve DB path under static/images/; fall back if file missing.
 @app.template_filter("texture_url")
 def texture_image_url(address):
+    """Resolve a stored texture address to a safe static URL.
+
+    Falls back to ``DEFAULT_TEXTURE_URL`` if the address is empty, points
+    outside ``static/images/``, or the file no longer exists on disk.
+    """
     if not address:
         return DEFAULT_TEXTURE_URL
     addr = str(address).strip().replace("\\", "/")
     if addr.startswith("/static/images/"):
-        rel = addr[len("/static/images/") :]
+        rel = addr[len("/static/images/"):]
     elif addr.startswith("static/images/"):
-        rel = addr[len("static/images/") :]
+        rel = addr[len("static/images/"):]
     else:
         rel = os.path.basename(addr)
 
@@ -58,7 +82,9 @@ def texture_image_url(address):
 
 
 # ========== Models ==========
-class User(db.Model):
+class User(db.Model):  # pylint: disable=too-few-public-methods
+    """A registered account."""
+
     __tablename__ = "User"
     user_id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.String(80), unique=True, nullable=False)
@@ -66,7 +92,9 @@ class User(db.Model):
     user_rating = db.Column(db.Integer, default=0)
 
 
-class Texture(db.Model):
+class Texture(db.Model):  # pylint: disable=too-few-public-methods
+    """An uploaded texture image and its metadata."""
+
     __tablename__ = "Texture"
     texture_id = db.Column(db.Integer, primary_key=True)
     texture_name = db.Column(db.String(80), unique=True, nullable=False)
@@ -75,7 +103,9 @@ class Texture(db.Model):
     texture_tags = db.Column(db.String(200), nullable=True)
 
 
-class Collection(db.Model):
+class Collection(db.Model):  # pylint: disable=too-few-public-methods
+    """A named grouping of textures owned by a user."""
+
     __tablename__ = "Collection"
     collection_id = db.Column(db.Integer, primary_key=True)
     collection_name = db.Column(db.String(80), unique=True, nullable=False)
@@ -83,21 +113,29 @@ class Collection(db.Model):
     collection_rating = db.Column(db.Integer, default=0)
 
 
-class Texture_Collection(db.Model):
+class TextureCollection(db.Model):  # pylint: disable=too-few-public-methods
+    """Join table linking a texture to a collection."""
+
     __tablename__ = "Texture_Collection"
     texture_collection_id = db.Column(db.Integer, primary_key=True)
     texture_id = db.Column(db.Integer, db.ForeignKey("Texture.texture_id"))
-    collection_id = db.Column(db.Integer, db.ForeignKey("Collection.collection_id"))
+    collection_id = db.Column(
+        db.Integer, db.ForeignKey("Collection.collection_id")
+    )
 
 
-class Texture_Views(db.Model):
+class TextureViews(db.Model):  # pylint: disable=too-few-public-methods
+    """Records a single user's view of a texture."""
+
     __tablename__ = "Texture_Views"
     texture_views_id = db.Column(db.Integer, primary_key=True)
     texture_id = db.Column(db.Integer, db.ForeignKey("Texture.texture_id"))
     user_id = db.Column(db.Integer, db.ForeignKey("User.user_id"))
 
 
-class Texture_Downloads(db.Model):
+class TextureDownloads(db.Model):  # pylint: disable=too-few-public-methods
+    """Records a single user's download of a texture."""
+
     __tablename__ = "Texture_Downloads"
     texture_downloads_id = db.Column(db.Integer, primary_key=True)
     texture_id = db.Column(db.Integer, db.ForeignKey("Texture.texture_id"))
@@ -105,13 +143,14 @@ class Texture_Downloads(db.Model):
 
 
 # ========== Error Handling ==========
-# Renders the error to the error page
 def render_error(message, status_code=400):
+    """Render the shared error page with the given message and status."""
     return render_template("error.html", error=message), status_code
 
-# Handles all errors types (404, 500..etc)
+
 @app.errorhandler(Exception)
 def handle_exception(error):
+    """Translate unhandled exceptions into a friendly error page."""
     if isinstance(error, HTTPException):
         code = error.code
         if code == 404:
@@ -130,10 +169,14 @@ def handle_exception(error):
     return render_error("An internal server error occurred.", 500)
 
 
-# ========== Helper FUnctions ==========
-# Decroator to automatically check login instead of doing it
-# nativly on every page
+# ========== Helper Functions ==========
 def login_required(view):
+    """Decorator that redirects to ``/login`` when no user is signed in.
+
+    On success, the current ``User`` is passed as the first positional
+    argument to the wrapped view.
+    """
+
     @wraps(view)
     def wrapped(*args, **kwargs):
         user = get_current_user()
@@ -144,265 +187,263 @@ def login_required(view):
     return wrapped
 
 
-# Helper function to get an obj or return a 404
-# useful if an obj needs to exist
 def get_or_404(model, **filters):
+    """Return the matching row, or abort with a 404 if none exists."""
     obj = model.query.filter_by(**filters).first()
     if obj is None:
         abort(404)
     return obj
 
 
-# Helper function returns returns if an obj exists
-def exists(model, **filters):
+def record_exists(model, **filters):
+    """Return whether a row matching ``filters`` exists for ``model``."""
     return model.query.filter_by(**filters).first() is not None
 
 
-# Helper function returns the obj or none
 def get_or_none(model, **filters):
+    """Return the matching row, or ``None`` if none exists."""
     return model.query.filter_by(**filters).first()
 
 
-# cascadingly deletes an items from all its instances in the database
 def cascade_delete(mapping):
+    """Delete rows across several tables in one transaction.
+
+    ``mapping`` is an iterable of ``(model, column, value)`` tuples; every
+    row where ``column == value`` is removed from ``model``.
+    """
     for model, column, value in mapping:
         db.session.execute(delete(model).where(column == value))
     db.session.commit()
 
 
-# Checks if an item exists then adds it to the database
 def record_once(model, **filters):
-    exists = model.query.filter_by(**filters).first() is not None
-    if not exists:
+    """Insert a row for ``model`` if one matching ``filters`` doesn't exist."""
+    already_exists = model.query.filter_by(**filters).first() is not None
+    if not already_exists:
         db.session.add(model(**filters))
         db.session.commit()
 
 
+# ========== Home page helpers ==========
+def _get_page_config(page):
+    """Return the item list and field names that ``page`` browses.
+
+    Page 0 browses textures, page 1 browses collections; any other value
+    yields an empty, fieldless configuration.
+    """
+    if page == 0:
+        return Texture.query.all(), "texture_name", "texture_tags", "texture_user_id"
+    if page == 1:
+        return Collection.query.all(), "collection_name", None, "collection_user_id"
+    return [], None, None, None
+
+
+def _get_filter_params():
+    """Read the search/tags/user/sort filter params for the current request."""
+    source = request.form if request.method == "POST" else request.args
+    return {
+        "search": source.get("search", "").strip(),
+        "tags": source.get("tags", "").strip(),
+        "user": source.get("user", "").strip(),
+        "sort": source.get("sort", ""),
+    }
+
+
+def _filter_by_name(page_items, name_field, search_query):
+    """Keep items whose ``name_field`` contains ``search_query`` (case-insensitive)."""
+    if not search_query or len(search_query) >= NAME_MAX_LENGTH:
+        return page_items
+    lower_search = search_query.lower()
+    return [
+        item
+        for item in page_items
+        if lower_search in (getattr(item, name_field, "") or "").lower()
+    ]
+
+
+def _filter_by_owner(page_items, owner_field, user_query):
+    """Keep items owned by the user named ``user_query``."""
+    if not (user_query and owner_field) or len(user_query) >= NAME_MAX_LENGTH:
+        return page_items
+    owner = get_or_none(User, user_name=user_query)
+    if not owner:
+        return []
+    return [
+        item for item in page_items if getattr(item, owner_field, None) == owner.user_id
+    ]
+
+
+def _filter_by_tags(page_items, tags_field, tag_query):
+    """Keep items that share at least one tag with the comma-separated ``tag_query``."""
+    if not (tags_field and tag_query) or len(tag_query) >= NAME_MAX_LENGTH:
+        return page_items
+
+    selected_tags = [tag.strip().lower() for tag in tag_query.split(",") if tag.strip()]
+    matched = []
+    for item in page_items:
+        raw_tags = getattr(item, tags_field, "") or ""
+        item_tags = [tag.strip().lower() for tag in raw_tags.split(",") if tag.strip()]
+        if any(tag in item_tags for tag in selected_tags):
+            matched.append(item)
+    return matched
+
+
+def _get_texture_counts():
+    """Return ``(view_counts, download_counts)`` dicts keyed by texture id."""
+    view_counts = dict(
+        db.session.query(
+            TextureViews.texture_id,
+            func.count(TextureViews.texture_views_id),  # pylint: disable=not-callable
+        )
+        .group_by(TextureViews.texture_id)
+        .all()
+    )
+    download_counts = dict(
+        db.session.query(
+            TextureDownloads.texture_id,
+            func.count(  # pylint: disable=not-callable
+                TextureDownloads.texture_downloads_id
+            ),
+        )
+        .group_by(TextureDownloads.texture_id)
+        .all()
+    )
+    return view_counts, download_counts
+
+
+def _by_download_count(download_counts):
+    """Return a sort key function ranking items by download count."""
+    def key(item):
+        return download_counts.get(getattr(item, "texture_id", None), 0)
+    return key
+
+
+def _by_view_count(view_counts):
+    """Return a sort key function ranking items by view count."""
+    def key(item):
+        return view_counts.get(getattr(item, "texture_id", None), 0)
+    return key
+
+
+def _by_name(name_field):
+    """Return a sort key function ranking items alphabetically by name."""
+    def key(item):
+        return (getattr(item, name_field, "") or "").lower()
+    return key
+
+
+def _sort_items(items, sort, name_field, view_counts, download_counts):
+    """Sort ``items`` per the requested ``sort`` mode."""
+    if sort == "downloads":
+        return sorted(items, key=_by_download_count(download_counts), reverse=True)
+    if sort == "ascending":
+        return sorted(items, key=_by_name(name_field))
+    if sort == "descending":
+        return sorted(items, key=_by_name(name_field), reverse=True)
+    # Default: most viewed first.
+    return sorted(items, key=_by_view_count(view_counts), reverse=True)
+
+
 # ========== Routes ==========
-# Rediracts to the default textures page
 @app.route("/")
-def route():
+def index():
+    """Redirect the root URL to the default textures page."""
     return redirect("/0")
 
 
-# Home page is determined by 1 or 2 where 1 == textures and 2 == collection
-# This simplifies code as most functionality is shared across both
 @app.route("/<int:page>", methods=["POST", "GET"])
 def home(page=0):
-    if page == 0:  # Textures Page
-        page_items = Texture.query.all()
-        name_field = "texture_name"
-        tags_field = "texture_tags"
-        owner_field = "texture_user_id"
-    elif page == 1:  # Colections Page
-        page_items = Collection.query.all()
-        name_field = "collection_name"
-        tags_field = None
-        owner_field = "collection_user_id"
-    else:  # Error exeption
-        page_items = []
-        name_field = None
-        tags_field = None
-        owner_field = None
+    """Browse textures (page 0) or collections (page 1) with filters/sort."""
+    page_items, name_field, tags_field, owner_field = _get_page_config(page)
+    params = _get_filter_params()
 
-    # Filtering
-    # Gets selected filtering options
-    if request.method == "POST":
-        # Pull filter/sort params from form body on POST
-        sort = request.form.get("sort", "")
-        search_query = request.form.get("search", "").strip()
-        tag_query = request.form.get("tags", "").strip()
-        user_query = request.form.get("user", "").strip()
-    else:
-        # Pull filter/sort params from query string on GET
-        search_query = request.args.get("search", "").strip()
-        tag_query = request.args.get("tags", "").strip()
-        user_query = request.args.get("user", "").strip()
-        sort = request.args.get("sort", "")
-
-    # --- Filter by name (search box) ---
-    # Only apply the filter if there's a query and it's under 20 chars;
-    # otherwise fall back to the full unfiltered list.
-    if search_query and len(search_query) < 20:
-        lower_search = search_query.lower()
-        matched_by_name = [
-            item
-            for item in page_items
-            if lower_search in (getattr(item, name_field, "") or "").lower()
-        ]
-    else:
-        matched_by_name = page_items
-
-    # --- Filter by uploader/owner username ---
-    # Look up the User by name, then keep only items whose owner field
-    # (texture_user_id / collection_user_id) matches that user's id.
-    if user_query and owner_field and len(user_query) < 20:
-        owner = get_or_none(User, user_name=user_query)
-        matched_by_user = (
-            [
-                item
-                for item in page_items
-                if getattr(item, owner_field, None) == owner.user_id
-            ]
-            if owner
-            else []
-        )
-    else:
-        matched_by_user = page_items
-
-    # --- Filter by tags (textures only; tags_field is None for collections) ---
-    # Splits the query into individual tags, splits each item's stored tag
-    # string the same way, and keeps items with at least one overlapping tag.
-    if tags_field and tag_query and len(tag_query) < 20:
-        selected_tags = [
-            tag.strip().lower() for tag in tag_query.split(",") if tag.strip()
-        ]
-        matched_by_tags = []
-        for item in page_items:
-            raw_tags = getattr(item, tags_field, "") or ""
-            item_tag_list = [
-                tag.strip().lower() for tag in raw_tags.split(",") if tag.strip()
-            ]
-            if any(tag in item_tag_list for tag in selected_tags):
-                matched_by_tags.append(item)
-    else:
-        matched_by_tags = page_items
-
-    # --- Combine all three filters (AND logic) ---
-    # An item only survives if it appears in all three matched lists.
+    filtered_items = _filter_by_name(page_items, name_field, params["search"])
     filtered_items = [
-        item
-        for item in page_items
-        if item in matched_by_name
-        and item in matched_by_tags
-        and item in matched_by_user
+        item for item in filtered_items
+        if item in _filter_by_owner(page_items, owner_field, params["user"])
+    ]
+    filtered_items = [
+        item for item in filtered_items
+        if item in _filter_by_tags(page_items, tags_field, params["tags"])
     ]
 
-    # --- Precompute view/download counts from the join tables ---
-    # These only make sense for Textures (page == 0); Texture_Views and
-    # Texture_Downloads both key off texture_id, not collection_id.
     if page == 0:
-        view_counts = dict(
-            db.session.query(
-                Texture_Views.texture_id, func.count(Texture_Views.texture_views_id)
-            )
-            .group_by(Texture_Views.texture_id)
-            .all()
-        )
-        download_counts = dict(
-            db.session.query(
-                Texture_Downloads.texture_id,
-                func.count(Texture_Downloads.texture_downloads_id),
-            )
-            .group_by(Texture_Downloads.texture_id)
-            .all()
-        )
+        view_counts, download_counts = _get_texture_counts()
     else:
-        # Collections have no view/download tracking, so counts are empty
-        view_counts = {}
-        download_counts = {}
+        view_counts, download_counts = {}, {}
 
-    # --- Sorting ---
-    match sort:
-        case "Downloads":
-            # Look up each item's download count from the precomputed dict,
-            # defaulting to 0 for items with no recorded downloads
-            filtered_items = sorted(
-                filtered_items,
-                key=lambda item: download_counts.get(
-                    getattr(item, "texture_id", None), 0
-                ),
-                reverse=True,
-            )
-        case "ascending":
-            # A-Z by name field
-            filtered_items = sorted(
-                filtered_items,
-                key=lambda item: (getattr(item, name_field, "") or "").lower(),
-            )
-        case "descending":
-            # Z-A by name field
-            filtered_items = sorted(
-                filtered_items,
-                key=lambda item: (getattr(item, name_field, "") or "").lower(),
-                reverse=True,
-            )
-        case _:  # Default 'Views'
-            # Look up each item's view count from the precomputed dict,
-            # defaulting to 0 for items with no recorded views
-            filtered_items = sorted(
-                filtered_items,
-                key=lambda item: view_counts.get(getattr(item, "texture_id", None), 0),
-                reverse=True,
-            )
+    filtered_items = _sort_items(
+        filtered_items, params["sort"], name_field, view_counts, download_counts
+    )
 
     return render_template(
         "home.html",
         user=get_current_user(),
         items=filtered_items,
         page=page,
-        search_query=search_query,
-        tag_query=tag_query,
-        user_query=user_query,
+        search_query=params["search"],
+        tag_query=params["tags"],
+        user_query=params["user"],
     )
+
+
+def _update_texture_collections(texture_id):
+    """Handle the add/remove-from-collection form on the texture page."""
+    action = request.form.get("action")
+    collection_id = request.form.get("collection")
+
+    if not collection_id:
+        return redirect("/create_collection")
+
+    if action == "add":
+        db.session.add(
+            TextureCollection(texture_id=texture_id, collection_id=collection_id)
+        )
+    elif action == "remove":
+        TextureCollection.query.filter_by(
+            texture_id=texture_id, collection_id=collection_id
+        ).delete()
+
+    db.session.commit()
+    return None
 
 
 @app.route("/texture/<texture_id>", methods=["POST", "GET"])
 @login_required
-def texture(user, texture_id):
-    # Fetches users collections to be used for the 'add to collection' drop-down
+def texture_detail(user, texture_id):
+    """Show a texture's details and manage its collection membership."""
     collections = Collection.query.filter_by(collection_user_id=user.user_id).all()
 
-    texture = get_or_404(Texture, texture_id=texture_id)
-    uploaded_user = get_or_404(User, user_id=texture.texture_user_id)
+    texture_obj = get_or_404(Texture, texture_id=texture_id)
+    uploaded_user = get_or_404(User, user_id=texture_obj.texture_user_id)
 
-    # Handles adding and removing the texture from collection
-    # - Makes sure only owned user can modify
-    if (texture.texture_user_id == user.user_id) and (request.method == "POST"):
-        action = request.form.get("action")
-        collection_id = request.form.get("collection")
+    is_owner = texture_obj.texture_user_id == user.user_id
+    if is_owner and request.method == "POST":
+        redirect_response = _update_texture_collections(texture_id)
+        if redirect_response is not None:
+            return redirect_response
 
-        if collection_id:
-            if action == "add":
-                tc = Texture_Collection(
-                    texture_id=texture_id, collection_id=collection_id
-                )
-                db.session.add(tc)
-
-            elif action == "remove":
-                Texture_Collection.query.filter_by(
-                    texture_id=texture_id, collection_id=collection_id
-                ).delete()
-        else:
-            # if the user has no collection, takes them to the create collection page
-            return redirect("/create_collection")
-
-        db.session.commit()
-
-    # collection_ids that already contain this texture
     in_collections = {
         row.collection_id
-        for row in Texture_Collection.query.filter_by(texture_id=texture_id).all()
+        for row in TextureCollection.query.filter_by(texture_id=texture_id).all()
     }
-
-    # keyed by collection_id (ints), not str(c) — much easier to use in JS
     collections_contained = {
         c.collection_id: (c.collection_id in in_collections) for c in collections
     }
 
-    # Handles users only accounting for 1 view per texture
-    already_viewed = exists(Texture_Views, texture_id=texture_id, user_id=user.user_id)
-
+    already_viewed = record_exists(
+        TextureViews, texture_id=texture_id, user_id=user.user_id
+    )
     if not already_viewed:
-        record_once(Texture_Views, texture_id=texture_id, user_id=user.user_id)
+        record_once(TextureViews, texture_id=texture_id, user_id=user.user_id)
 
-    views = Texture_Views.query.filter_by(texture_id=texture_id).count()
-    downloads = Texture_Downloads.query.filter_by(texture_id=texture_id).count()
+    views = TextureViews.query.filter_by(texture_id=texture_id).count()
+    downloads = TextureDownloads.query.filter_by(texture_id=texture_id).count()
 
     return render_template(
         "texture.html",
         user=user,
-        texture=texture,
+        texture=texture_obj,
         uploaded_user=uploaded_user,
         collections=collections,
         collections_contained=collections_contained,
@@ -411,126 +452,101 @@ def texture(user, texture_id):
     )
 
 
-# Collection page where the collections textures are rendered
 @app.route("/collection/<_collection_id>", methods=["GET", "POST"])
 @login_required
-def collection(user, _collection_id):
-
-    collection = Collection.query.filter_by(
-        collection_id=_collection_id
-    ).one()  # gets singular collection
+def collection_detail(user, _collection_id):
+    """Show a collection and the textures it contains."""
+    collection_obj = Collection.query.filter_by(collection_id=_collection_id).one()
     collection_user = User.query.filter_by(
-        user_id=collection.collection_user_id
-    ).one()  # gets collection users
+        user_id=collection_obj.collection_user_id
+    ).one()
 
-    texture_ids = Texture_Collection.query.filter_by(
-        collection_id=collection.collection_id
-    ).all()  # gets texture_ids
+    texture_links = TextureCollection.query.filter_by(
+        collection_id=collection_obj.collection_id
+    ).all()
     textures = [
-        Texture.query.filter_by(texture_id=tc.texture_id).one() for tc in texture_ids
-    ]  # gets textures
+        Texture.query.filter_by(texture_id=link.texture_id).one()
+        for link in texture_links
+    ]
 
     return render_template(
         "collection.html",
         user=user,
-        collection=collection,
+        collection=collection_obj,
         collection_user=collection_user,
         textures=textures,
     )
 
 
-# Signup page where users create a new account
-# - Handles username and password max & min lengths
-# - Handles only allowing unique usernames
 @app.route("/signup", methods=["POST", "GET"])
 def signup():
+    """Create a new account with a unique username and hashed password."""
     error = None
 
     if request.method == "POST":
-        # Gets the username and password from the page form
         username = request.form.get("username")
         password = request.form.get("password")
 
-        if username and password:
-            if (
-                len(username) > 20 or len(password) > 20
-            ):  # username and password max & min lengths
-                error = "Username or Password is Too Long"
-            else:
-                if exists(User, user_name=username):
-                    error = "There is Already an Account with this Username"
-                else:
-                    # Creates the user in the database
-                    hashed_password = generate_password_hash(password)
-                    new_user = User(
-                        user_name=username, user_password=hashed_password, user_rating=0
-                    )
-                    db.session.add(new_user)
-                    db.session.commit()
-                    session["user_id"] = new_user.user_id
-                    return redirect("/")
-        else:
+        if not (username and password):
             error = "Please enter a Username & Password"
+        elif len(username) > CREDENTIAL_MAX_LENGTH or len(password) > CREDENTIAL_MAX_LENGTH:
+            error = "Username or Password is Too Long"
+        elif record_exists(User, user_name=username):
+            error = "There is Already an Account with this Username"
+        else:
+            hashed_password = generate_password_hash(password)
+            new_user = User(
+                user_name=username, user_password=hashed_password, user_rating=0
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            session["user_id"] = new_user.user_id
+            return redirect("/")
 
     return render_template("signup.html", error=error)
 
 
-# Login page where users login to their exsisting account
-# - Handles username and password max & min lengths
-# - Handles uername or password incorrect warning
-# - Handles user sessions
 @app.route("/login", methods=["POST", "GET"])
 def login():
+    """Authenticate a user, upgrading legacy plaintext passwords on the fly."""
     error = None
 
     if request.method == "POST":
-        # Gets the username and password from the page form
         username = request.form.get("username")
         password = request.form.get("password")
 
-        if username and password:
-            if (
-                len(username) > 20 or len(password) > 20
-            ):  # username and password max & min lengths
-                error = "Username or Password is Too Long"
-            else:
-                # uername or password incorrect warning
-                _user = get_or_none(User, user_name=username)
-                if _user and check_password_hash(_user.user_password, password):
-                    session["user_id"] = _user.user_id
-                    return redirect("/")
-                elif password == _user.user_password:  # legacy plaintext fallback
-                    _user.user_password = generate_password_hash(password)
-                    db.session.commit()
-                    session["user_id"] = _user.user_id
-                    return redirect("/")
-                else:
-                    error = "Username or Password is Incorrect"
-
-        else:
+        if not (username and password):
             error = "Please enter a Username & Password"
+        elif len(username) > CREDENTIAL_MAX_LENGTH or len(password) > CREDENTIAL_MAX_LENGTH:
+            error = "Username or Password is Too Long"
+        else:
+            found_user = get_or_none(User, user_name=username)
+            if found_user and check_password_hash(found_user.user_password, password):
+                session["user_id"] = found_user.user_id
+                return redirect("/")
+            if found_user and password == found_user.user_password:
+                # Legacy plaintext account: upgrade it to a hashed password.
+                found_user.user_password = generate_password_hash(password)
+                db.session.commit()
+                session["user_id"] = found_user.user_id
+                return redirect("/")
+            error = "Username or Password is Incorrect"
 
     return render_template("login.html", error=error)
 
 
-# Simple route to logout the user and clears the user session
 @app.route("/logout", methods=["POST", "GET"])
 def logout():
+    """Clear the current session."""
     session["user_id"] = None
     return redirect("/")
 
 
-# User page where they can see their user texture and collections and manage their profile
-# - Shows Users Textures
-# - Shows users Collections
-# - Handles logged in user and external users
 @app.route("/user/<username>")
 def user_profile(username):
+    """Show a user's profile, textures and collections."""
     profile_user = get_or_404(User, user_name=username)
-    if profile_user is None:  # Makes sure user_id exists
-        abort(404)
 
-    # Fetches users textures and collection
     textures = Texture.query.filter_by(texture_user_id=profile_user.user_id).all()
     collections = Collection.query.filter_by(
         collection_user_id=profile_user.user_id
@@ -552,149 +568,145 @@ def user_profile(username):
     )
 
 
-# Upload page where users upload a texture
-# - Handles only allowing specific file types
-# - Handles Min & Max name characters
-# - Handles CSV Tags
-# - Handles saving iamges to internal storage & Database
+def _validate_upload(display_name, texture_tags, file):
+    """Return an error string for the upload form, or ``None`` if it's valid."""
+    has_file = bool(file and file.filename)
+    ext = os.path.splitext(secure_filename(file.filename))[1].lower() if has_file else ""
+
+    checks = (
+        (not display_name, "Please enter a display name."),
+        (
+            len(display_name) > NAME_MAX_LENGTH or len(display_name) < NAME_MIN_LENGTH,
+            "Name Must be Between 5 and 20 Characters Long",
+        ),
+        (len(texture_tags) > TAGS_MAX_LENGTH, "Tags Must be Less Than 100 Characters Long"),
+        (not has_file, "Please choose an image file."),
+        (
+            has_file and record_exists(Texture, texture_name=display_name),
+            "That display name is already taken.",
+        ),
+        (has_file and ext not in ALLOWED_IMAGE_EXTENSIONS, "Allowed types: PNG, JPEG, JPG"),
+    )
+
+    for failed, message in checks:
+        if failed:
+            return message
+    return None
+
+
 @app.route("/upload", methods=["GET", "POST"])
 @login_required
 def upload(user):
+    """Handle uploading a new texture image and its metadata."""
     error = None
 
     if request.method == "POST":
-        # Gets the form data
         display_name = (request.form.get("display_name") or "").strip()
         file = request.files.get("image")
         texture_tags = request.form.get("tags", "").strip()
 
-        if len(display_name) > 20 or len(display_name) < 5:  # Character limits
-            error = "Name Must be Between 5 and 20 Characters Long"
-        elif len(texture_tags) > 100:  # Tag character limit
-            error = "Tags Must be Less Than 100 Characters Long"
-        elif not display_name:  # Must be display name
-            error = "Please enter a display name."
-        elif not file or file.filename == "":  # Must be an image file
-            error = "Please choose an image file."
-        elif exists(Texture, texture_name=display_name):  # Must have unique name
-            error = "That display name is already taken."
-        else:
-            original = secure_filename(file.filename)
-            ext = os.path.splitext(original)[1].lower()
-            if ext not in ALLOWED_IMAGE_EXTENSIONS:  # Makes sure file type is valid
-                error = "Allowed types: PNG, JPEG, JPG"
-            else:
-                # all condition met and adds to database
-                os.makedirs(STATIC_IMAGES_DIR, exist_ok=True)
-                stored_name = f"{uuid.uuid4().hex}{ext}"
-                dest = os.path.join(STATIC_IMAGES_DIR, stored_name)
-                file.save(dest)  # Saves file to directory
-                url_path = f"/static/images/{stored_name}"
-                texture = Texture(
-                    texture_name=display_name,
-                    texture_address=url_path,
-                    texture_user_id=user.user_id,
-                    texture_tags=texture_tags,
-                )
-                db.session.add(texture)
-                db.session.commit()
-                return redirect("/")
+        error = _validate_upload(display_name, texture_tags, file)
+        if error is None:
+            os.makedirs(STATIC_IMAGES_DIR, exist_ok=True)
+            ext = os.path.splitext(secure_filename(file.filename))[1].lower()
+            stored_name = f"{uuid.uuid4().hex}{ext}"
+            file.save(os.path.join(STATIC_IMAGES_DIR, stored_name))
+
+            new_texture = Texture(
+                texture_name=display_name,
+                texture_address=f"/static/images/{stored_name}",
+                texture_user_id=user.user_id,
+                texture_tags=texture_tags,
+            )
+            db.session.add(new_texture)
+            db.session.commit()
+            return redirect("/")
 
     return render_template("upload.html", user=user, error=error)
 
 
-# Create colection Page  where users create collection
-# - Handles Min & Max name characters
 @app.route("/create_collection", methods=["GET", "POST"])
 @login_required
 def create_collection(user):
+    """Handle creating a new, empty collection owned by the current user."""
     error = None
 
     if request.method == "POST":
-        # Gets the display name from the form
         display_name = (request.form.get("display_name") or "").strip()
 
-        if len(display_name) > 20 or len(display_name) < 5:  # Character limit
+        if len(display_name) > NAME_MAX_LENGTH or len(display_name) < NAME_MIN_LENGTH:
             error = "Name Must Be Between 5 and 20 Characters Long"
-
         elif display_name:
-            # All conditions met, Creating new collection associated with the users profile
-            collection = Collection(
+            new_collection = Collection(
                 collection_name=display_name, collection_user_id=user.user_id
             )
-            db.session.add(collection)
+            db.session.add(new_collection)
             db.session.commit()
-
             return redirect("/")
 
     return render_template("create_collection.html", user=user, error=error)
 
 
-# Delete Texture
-# - Deltes all instances of a texture through all relevant tables
 @app.route("/delete_texture/<int:texture_id>", methods=["GET", "POST"])
-def delete_texture(texture_id):
+@login_required
+def delete_texture(user, texture_id):
+    """Delete a texture and its related view/download/collection rows."""
+    texture_obj = get_or_404(Texture, texture_id=texture_id)
+    if texture_obj.texture_user_id != user.user_id:
+        return redirect("/")
+
     cascade_delete(
         [
-            (Texture_Views, Texture_Views.texture_id, texture_id),
-            (Texture_Downloads, Texture_Downloads.texture_id, texture_id),
-            (Texture_Collection, Texture_Collection.texture_id, texture_id),
+            (TextureViews, TextureViews.texture_id, texture_id),
+            (TextureDownloads, TextureDownloads.texture_id, texture_id),
+            (TextureCollection, TextureCollection.texture_id, texture_id),
             (Texture, Texture.texture_id, texture_id),
         ]
     )
-
     return redirect("/")
 
 
-# Delete Collection
-# - Deltes all instances of a collection through all relevant tables
 @app.route("/delete_collection/<int:collection_id>", methods=["GET", "POST"])
-def delete_collection(collection_id):
+@login_required
+def delete_collection(user, collection_id):
+    """Delete a collection and its texture memberships."""
+    collection_obj = get_or_404(Collection, collection_id=collection_id)
+    if collection_obj.collection_user_id != user.user_id:
+        return redirect("/")
+
     cascade_delete(
         [
             (Collection, Collection.collection_id, collection_id),
-            (Texture_Collection, Texture_Collection.collection_id, collection_id),
+            (TextureCollection, TextureCollection.collection_id, collection_id),
         ]
     )
-
     return redirect("/")
 
 
-# Download Image route where it downloads the image of the selected texture page
-# - Handles fetching download from server storage
-# - Handles Texture Downloads Stat
 @app.route("/download/<int:texture_id>", methods=["GET", "POST"])
 @login_required
 def download_image(user, texture_id):
-    texture = get_or_404(Texture, texture_id=texture_id)
-    if not texture:  # Handles no texture error
-        return "Texture not found", 404
+    """Send the stored image file for a texture and record the download."""
+    texture_obj = get_or_404(Texture, texture_id=texture_id)
 
-
-
-    # Extract filename from the stored path
-    if texture.texture_address.startswith("/static/images/"):
-        filename = texture.texture_address[len("/static/images/") :]
+    if texture_obj.texture_address.startswith("/static/images/"):
+        filename = texture_obj.texture_address[len("/static/images/"):]
     else:
-        filename = os.path.basename(texture.texture_address)
+        filename = os.path.basename(texture_obj.texture_address)
 
     file_path = os.path.join(STATIC_IMAGES_DIR, filename)
     if not os.path.isfile(file_path):
         return "File not found", 404
 
-    # Texture Downloads Stat
-    already_downloaded = exists(
-        Texture_Downloads, texture_id=texture_id, user_id=user.user_id
+    already_downloaded = record_exists(
+        TextureDownloads, texture_id=texture_id, user_id=user.user_id
     )
-
     if not already_downloaded:
-        record_once(Texture_Downloads, texture_id=texture_id, user_id=user.user_id)
+        record_once(TextureDownloads, texture_id=texture_id, user_id=user.user_id)
 
-    # Preserve the real file extension so the downloaded file has the correct type
-    ext = os.path.splitext(filename)[1]  # e.g. ".png", ".jpg"
-    download_name = secure_filename(texture.texture_name) + ext
+    ext = os.path.splitext(filename)[1]
+    download_name = secure_filename(texture_obj.texture_name) + ext
 
-    # Sends file to users device
     return send_file(file_path, as_attachment=True, download_name=download_name)
 
 
